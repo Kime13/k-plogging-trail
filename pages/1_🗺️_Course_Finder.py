@@ -2,6 +2,8 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 from utils.jeju_olle import JEJU_OLLE_COURSES, JEJU_THEMES, HIGHLIGHT_COORDS
+from utils.seoul_courses import SEOUL_COURSES, SEOUL_HIGHLIGHT_COORDS, SEOUL_THEMES
+from utils.busan_courses import BUSAN_COURSES, BUSAN_HIGHLIGHT_COORDS, BUSAN_THEMES
 from api.claude_api import curate_in_english, generate_plogging_route
 from api.tour_api import get_nearby_restaurants, get_nearby_accommodations, format_place
 
@@ -69,8 +71,27 @@ h3 { color: #2D6A4F; }
 </style>
 """, unsafe_allow_html=True)
 
+# 지역별 데이터 매핑
+REGION_DATA = {
+    "🌿 Jeju": {
+        "courses": JEJU_OLLE_COURSES,
+        "themes": JEJU_THEMES,
+        "coords": HIGHLIGHT_COORDS,
+    },
+    "🏙️ Seoul": {
+        "courses": SEOUL_COURSES,
+        "themes": SEOUL_THEMES,
+        "coords": SEOUL_HIGHLIGHT_COORDS,
+    },
+    "🌊 Busan": {
+        "courses": BUSAN_COURSES,
+        "themes": BUSAN_THEMES,
+        "coords": BUSAN_HIGHLIGHT_COORDS,
+    },
+}
+
 # session_state 초기화
-for key in ["selected_course", "route", "descriptions", "restaurants", "accommodations"]:
+for key in ["selected_course", "route", "descriptions", "restaurants", "accommodations", "highlight_coords"]:
     if key not in st.session_state:
         st.session_state[key] = None if key != "descriptions" else {}
 
@@ -79,15 +100,20 @@ with st.sidebar:
     st.markdown("## 🌿 Find Your Route")
     st.markdown("---")
 
+    region = st.selectbox("🗺️ Region", list(REGION_DATA.keys()))
+    region_info = REGION_DATA[region]
+    all_themes = region_info["themes"]
+    highlight_coords = region_info["coords"]
+
     difficulty_filter = st.selectbox("💪 Difficulty", ["All", "Easy", "Moderate", "Challenge"])
     theme_filter = st.selectbox(
-        "🎨 Theme", ["All"] + list(JEJU_THEMES.keys()),
-        format_func=lambda x: "All Themes" if x == "All" else JEJU_THEMES[x]
+        "🎨 Theme", ["All"] + list(all_themes.keys()),
+        format_func=lambda x: "All Themes" if x == "All" else all_themes[x]
     )
     pet_filter = st.checkbox("🐾 Pet-friendly only")
     st.markdown("---")
 
-    courses = JEJU_OLLE_COURSES
+    courses = region_info["courses"]
     if difficulty_filter != "All":
         courses = [c for c in courses if c["difficulty"] == difficulty_filter]
     if theme_filter != "All":
@@ -119,6 +145,7 @@ with st.sidebar:
 
         if st.button("🏃 Start This Route", type="primary", use_container_width=True):
             st.session_state.selected_course = selected_course
+            st.session_state.highlight_coords = highlight_coords
             st.session_state.route = None
             st.session_state.descriptions = {}
             st.session_state.restaurants = None
@@ -130,6 +157,7 @@ with st.sidebar:
 # ── 메인 화면 ──
 if st.session_state.selected_course:
     course = st.session_state.selected_course
+    highlight_coords = st.session_state.highlight_coords or HIGHLIGHT_COORDS
 
     if st.button("← Back to All Courses"):
         st.session_state.selected_course = None
@@ -139,7 +167,10 @@ if st.session_state.selected_course:
         st.session_state.accommodations = None
         st.rerun()
 
-    theme_emoji = {"coastal": "🌊", "island": "🏝️", "forest": "🌲", "rural": "🌾", "urban": "🏙️"}
+    theme_emoji = {"coastal": "🌊", "island": "🏝️", "forest": "🌲", "rural": "🌾",
+                   "urban": "🏙️", "history": "🏯", "river": "🌊", "nature": "🌿",
+                   "beach": "🏖️", "heritage": "🏛️", "mountain": "⛰️"}
+
     st.markdown(f"""
     <div class='course-header'>
         <h2>{theme_emoji.get(course['theme'], '🌿')} {course['name_en']}</h2>
@@ -156,61 +187,50 @@ if st.session_state.selected_course:
         diff_color = {"Easy": "#2D6A4F", "Moderate": "#856404", "Challenge": "#842029"}[course['difficulty']]
         st.markdown(f"<div class='metric-card'><div class='value' style='color:{diff_color};font-size:1.4rem'>{course['difficulty']}</div><div class='label'>Difficulty</div></div>", unsafe_allow_html=True)
     with col4:
-        theme_label = JEJU_THEMES.get(course['theme'], course['theme'])
-        st.markdown(f"<div class='metric-card'><div class='value' style='font-size:1.2rem'>{theme_label}</div><div class='label'>Theme</div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='metric-card'><div class='value' style='font-size:1.1rem'>{'🐾 Yes' if course['pet_friendly'] else '❌ No'}</div><div class='label'>Pet-friendly</div></div>", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown(f"""
     <div class='info-banner'>
         🚩 <b>Start:</b> {course['start_en']} &nbsp;→&nbsp; 🏁 <b>End:</b> {course['end_en']}
-        &nbsp;&nbsp;|&nbsp;&nbsp; 🐾 Pet-friendly: {'Yes ✅' if course['pet_friendly'] else 'No ❌'}
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("---")
 
-    # TourAPI 데이터 먼저 로드 (지도보다 앞에)
+    # TourAPI 데이터 먼저 로드
     if st.session_state.restaurants is None:
         with st.spinner("Loading nearby spots..."):
-            st.session_state.restaurants = get_nearby_restaurants(
-                course["lat"], course["lon"]
-            )
+            st.session_state.restaurants = get_nearby_restaurants(course["lat"], course["lon"])
     if st.session_state.accommodations is None:
-        st.session_state.accommodations = get_nearby_accommodations(
-            course["lat"], course["lon"]
-        )
+        st.session_state.accommodations = get_nearby_accommodations(course["lat"], course["lon"])
 
-    # ── 지도 ──
+    # 지도
     st.markdown("### 🗺️ Route Map")
-        # 지도 중심을 시작점+하이라이트 평균으로 계산
     all_lats = [course['lat']]
     all_lons = [course['lon']]
     for h in course['highlights_en']:
-        if h in HIGHLIGHT_COORDS:
-            all_lats.append(HIGHLIGHT_COORDS[h][0])
-            all_lons.append(HIGHLIGHT_COORDS[h][1])
+        if h in highlight_coords:
+            all_lats.append(highlight_coords[h][0])
+            all_lons.append(highlight_coords[h][1])
     center_lat = sum(all_lats) / len(all_lats)
     center_lon = sum(all_lons) / len(all_lons)
-    m = folium.Map(location=[center_lat, center_lon], zoom_start=11, tiles="OpenStreetMap")
 
-    # 시작점
+    m = folium.Map(location=[center_lat, center_lon], zoom_start=13, tiles="OpenStreetMap")
+
     folium.CircleMarker(
         location=[course['lat'], course['lon']],
-        radius=14,
-        color="white",
-        fill=True,
-        fill_color="#2D6A4F",
-        fill_opacity=1.0,
+        radius=14, color="white", fill=True,
+        fill_color="#2D6A4F", fill_opacity=1.0,
         popup=folium.Popup(f"<b>🚩 Start: {course['start_en']}</b>", max_width=200),
         tooltip=f"🚩 Start: {course['start_en']}"
     ).add_to(m)
 
-    # 하이라이트 핀
     colors = ["blue", "purple", "orange", "red", "darkblue"]
     highlight_coords_list = []
     for i, highlight in enumerate(course['highlights_en']):
-        if highlight in HIGHLIGHT_COORDS:
-            coords = HIGHLIGHT_COORDS[highlight]
+        if highlight in highlight_coords:
+            coords = highlight_coords[highlight]
             highlight_coords_list.append(coords)
             folium.Marker(
                 location=coords,
@@ -225,7 +245,6 @@ if st.session_state.selected_course:
             color="#2D6A4F", weight=3, opacity=0.8, dash_array="6"
         ).add_to(m)
 
-    # 음식점 핀
     if st.session_state.restaurants:
         for r in st.session_state.restaurants[:4]:
             p = format_place(r)
@@ -240,7 +259,6 @@ if st.session_state.selected_course:
                 except:
                     pass
 
-    # 숙박 핀
     if st.session_state.accommodations:
         for a in st.session_state.accommodations[:4]:
             p = format_place(a)
@@ -255,23 +273,19 @@ if st.session_state.selected_course:
                 except:
                     pass
 
-    # 범례
     legend_html = """
     <div style='position:fixed;bottom:30px;left:50px;z-index:1000;
                 background:white;padding:10px 14px;border-radius:8px;
-                border:1px solid #ccc;font-size:12px;line-height:2;box-shadow:2px 2px 6px rgba(0,0,0,0.15)'>
-        🟢 Start Point<br>
-        ⭐ Highlights<br>
-        🔴 Restaurants<br>
-        🔵 Accommodations
+                border:1px solid #ccc;font-size:12px;line-height:2;
+                box-shadow:2px 2px 6px rgba(0,0,0,0.15)'>
+        🟢 Start Point<br>⭐ Highlights<br>🔴 Restaurants<br>🔵 Accommodations
     </div>
     """
     m.get_root().html.add_child(folium.Element(legend_html))
-
     st_folium(m, width=None, height=450, returned_objects=[])
+
     st.markdown("---")
 
-    # ── 하이라이트 + 루트 ──
     col1, col2 = st.columns([1, 1])
 
     with col1:
@@ -307,7 +321,6 @@ if st.session_state.selected_course:
             unsafe_allow_html=True
         )
 
-    # ── After Your Plogging ──
     st.markdown("---")
     st.markdown("### 🍽️ After Your Plogging")
     st.caption("Nearby spots powered by 한국관광공사 OpenAPI")
@@ -323,9 +336,7 @@ if st.session_state.selected_course:
                 st.markdown(f"""
                 <div class='place-card'>
                     <div style='font-weight:600;color:#2D6A4F;'>
-                        <a href='{kakao_url}' target='_blank' style='color:#2D6A4F;text-decoration:none;'>
-                            {p['title']} 🔗
-                        </a>
+                        <a href='{kakao_url}' target='_blank' style='color:#2D6A4F;text-decoration:none;'>{p['title']} 🔗</a>
                     </div>
                     <div style='font-size:0.82rem;color:#888;'>📍 {p['addr']}</div>
                     <div style='font-size:0.82rem;color:#888;'>📏 {p['dist']}km away</div>
@@ -344,9 +355,7 @@ if st.session_state.selected_course:
                 st.markdown(f"""
                 <div class='place-card'>
                     <div style='font-weight:600;color:#2D6A4F;'>
-                        <a href='{kakao_url}' target='_blank' style='color:#2D6A4F;text-decoration:none;'>
-                            {p['title']} 🔗
-                        </a>
+                        <a href='{kakao_url}' target='_blank' style='color:#2D6A4F;text-decoration:none;'>{p['title']} 🔗</a>
                     </div>
                     <div style='font-size:0.82rem;color:#888;'>📍 {p['addr']}</div>
                     <div style='font-size:0.82rem;color:#888;'>📏 {p['dist']}km away</div>
@@ -358,38 +367,43 @@ if st.session_state.selected_course:
 
 else:
     # 초기 화면
-    st.markdown("# 🌿 Jeju Olle Plogging Courses")
-    st.markdown("Select a course below or use the sidebar filters to find your perfect route.")
+    st.markdown("# 🌿 K-Plogging Trail Courses")
+    st.markdown("Select a region and course to get started!")
     st.markdown("---")
 
-    for theme, theme_label in JEJU_THEMES.items():
-        theme_courses = [c for c in JEJU_OLLE_COURSES if c["theme"] == theme]
-        if not theme_courses:
-            continue
-        st.markdown(f"### {theme_label}")
-        cols = st.columns(min(len(theme_courses), 3))
-        for i, course in enumerate(theme_courses[:3]):
-            with cols[i % 3]:
-                diff_color = {"Easy": "#2D6A4F", "Moderate": "#856404", "Challenge": "#842029"}[course['difficulty']]
-                st.markdown(f"""
-                <div style='background:white;border-radius:12px;padding:16px;
-                            border:1px solid #D4C9B8;margin-bottom:8px;
-                            box-shadow:0 2px 8px rgba(0,0,0,0.06);min-height:140px'>
-                    <div style='font-weight:700;color:#2D6A4F;margin-bottom:6px'>{course['name_en']}</div>
-                    <div style='font-size:0.82rem;color:#666;margin-bottom:10px'>{course['description_en'][:80]}...</div>
-                    <div style='font-size:0.8rem;'>
-                        📏 {course['distance_km']}km &nbsp;
-                        ⏱️ {course['duration_hours']}h &nbsp;
-                        <span style='color:{diff_color};font-weight:600'>{course['difficulty']}</span>
-                        {'&nbsp; 🐾' if course['pet_friendly'] else ''}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-                if st.button(f"View Route →", key=f"btn_{course['id']}"):
-                    st.session_state.selected_course = course
-                    st.session_state.route = None
-                    st.session_state.descriptions = {}
-                    st.session_state.restaurants = None
-                    st.session_state.accommodations = None
-                    st.rerun()
-        st.markdown("")
+    tab1, tab2, tab3 = st.tabs(["🌿 Jeju", "🏙️ Seoul", "🌊 Busan"])
+
+    for tab, (region_name, region_info) in zip([tab1, tab2, tab3], REGION_DATA.items()):
+        with tab:
+            for theme, theme_label in region_info["themes"].items():
+                theme_courses = [c for c in region_info["courses"] if c["theme"] == theme]
+                if not theme_courses:
+                    continue
+                st.markdown(f"### {theme_label}")
+                cols = st.columns(min(len(theme_courses), 3))
+                for i, course in enumerate(theme_courses[:3]):
+                    with cols[i % 3]:
+                        diff_color = {"Easy": "#2D6A4F", "Moderate": "#856404", "Challenge": "#842029"}[course['difficulty']]
+                        st.markdown(f"""
+                        <div style='background:white;border-radius:12px;padding:16px;
+                                    border:1px solid #D4C9B8;margin-bottom:8px;
+                                    box-shadow:0 2px 8px rgba(0,0,0,0.06);min-height:140px'>
+                            <div style='font-weight:700;color:#2D6A4F;margin-bottom:6px'>{course['name_en']}</div>
+                            <div style='font-size:0.82rem;color:#666;margin-bottom:10px'>{course['description_en'][:80]}...</div>
+                            <div style='font-size:0.8rem;'>
+                                📏 {course['distance_km']}km &nbsp;
+                                ⏱️ {course['duration_hours']}h &nbsp;
+                                <span style='color:{diff_color};font-weight:600'>{course['difficulty']}</span>
+                                {'&nbsp; 🐾' if course['pet_friendly'] else ''}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        if st.button(f"View Route →", key=f"btn_{course['id']}"):
+                            st.session_state.selected_course = course
+                            st.session_state.highlight_coords = region_info["coords"]
+                            st.session_state.route = None
+                            st.session_state.descriptions = {}
+                            st.session_state.restaurants = None
+                            st.session_state.accommodations = None
+                            st.rerun()
+                st.markdown("")
