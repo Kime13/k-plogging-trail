@@ -1,15 +1,21 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime, date
+from datetime import date
+from supabase import create_client
+import os
+from dotenv import load_dotenv
+from utils.jeju_olle import JEJU_OLLE_COURSES
+
+load_dotenv()
+
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
+supabase = create_client(url, key)
 
 st.set_page_config(page_title="Impact Dashboard", page_icon="♻️", layout="wide")
 
 st.title("♻️ Plogging Impact Dashboard")
 st.subheader("Track your contribution to a cleaner Korea")
-
-# session_state 초기화
-if "plogging_logs" not in st.session_state:
-    st.session_state.plogging_logs = []
 
 # ── 기록 입력 ──
 st.markdown("### 📝 Log Your Session")
@@ -18,7 +24,8 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     log_date = st.date_input("Date", value=date.today())
 with col2:
-    course_name = st.text_input("Course", placeholder="e.g. Olle Route 1")
+    course_options = [c["name_en"] for c in JEJU_OLLE_COURSES]
+    course_name = st.selectbox("Course", course_options)
 with col3:
     waste_kg = st.number_input("Waste collected (kg)", min_value=0.1, max_value=50.0, value=0.5, step=0.1)
 with col4:
@@ -31,32 +38,38 @@ waste_type = st.multiselect(
 )
 
 if st.button("➕ Log This Session", type="primary"):
-    if course_name:
-        st.session_state.plogging_logs.append({
+    try:
+        supabase.table("plogging_logs").insert({
             "date": str(log_date),
             "course": course_name,
             "waste_kg": waste_kg,
             "distance_km": distance_km,
             "waste_types": ", ".join(waste_type)
-        })
+        }).execute()
         st.success(f"✅ Logged! You collected {waste_kg}kg on {course_name}!")
         st.balloons()
-    else:
-        st.warning("Please enter a course name.")
+    except Exception as e:
+        st.error(f"Failed to save: {e}")
 
 st.markdown("---")
 
-# ── 더미 데이터 (데모용) ──
+# ── 데이터 로드 ──
+try:
+    response = supabase.table("plogging_logs").select("*").execute()
+    all_data = response.data
+except:
+    all_data = []
+
 DEMO_DATA = [
-    {"date": "2026-08-01", "course": "Olle Route 1", "waste_kg": 1.2, "distance_km": 15.1, "waste_types": "Plastic bottles, Food packaging"},
-    {"date": "2026-08-05", "course": "Olle Route 6", "waste_kg": 0.8, "distance_km": 11.0, "waste_types": "Cigarette butts, Plastic bottles"},
-    {"date": "2026-08-10", "course": "Olle Route 9", "waste_kg": 0.5, "distance_km": 8.4, "waste_types": "Food packaging, Styrofoam"},
-    {"date": "2026-08-15", "course": "Olle Route 14", "waste_kg": 2.1, "distance_km": 19.5, "waste_types": "Plastic bottles, Metal cans, Glass"},
-    {"date": "2026-08-20", "course": "Olle Route 21", "waste_kg": 0.9, "distance_km": 11.7, "waste_types": "Cigarette butts, Food packaging"},
+    {"date": "2026-08-01", "course": "Olle Route 1 ⭐ Best", "waste_kg": 1.2, "distance_km": 15.1, "waste_types": "Plastic bottles, Food packaging"},
+    {"date": "2026-08-05", "course": "Olle Route 6 ⭐ Oedolgae", "waste_kg": 0.8, "distance_km": 11.0, "waste_types": "Cigarette butts, Plastic bottles"},
+    {"date": "2026-08-10", "course": "Olle Route 9 ⭐ Sanbangsan", "waste_kg": 0.5, "distance_km": 8.4, "waste_types": "Food packaging, Styrofoam"},
+    {"date": "2026-08-15", "course": "Olle Route 14 ⭐ Hyeopjae", "waste_kg": 2.1, "distance_km": 19.5, "waste_types": "Plastic bottles, Metal cans"},
+    {"date": "2026-08-20", "course": "Olle Route 21 ⭐ Jimibong", "waste_kg": 0.9, "distance_km": 11.7, "waste_types": "Cigarette butts, Food packaging"},
 ]
 
-all_logs = DEMO_DATA + st.session_state.plogging_logs
-df = pd.DataFrame(all_logs)
+display_data = all_data if all_data else DEMO_DATA
+df = pd.DataFrame(display_data)
 
 # ── 누적 통계 ──
 st.markdown("### 🌍 Global Impact (All Participants)")
@@ -65,7 +78,7 @@ total_distance = df["distance_km"].sum()
 total_sessions = len(df)
 
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("Total Waste Collected", f"{total_waste:.1f} kg", delta=f"+{st.session_state.plogging_logs[-1]['waste_kg'] if st.session_state.plogging_logs else 0} kg today")
+col1.metric("Total Waste Collected", f"{total_waste:.1f} kg")
 col2.metric("Total Distance Jogged", f"{total_distance:.1f} km")
 col3.metric("Total Sessions", f"{total_sessions}")
 col4.metric("Avg per Session", f"{total_waste/total_sessions:.2f} kg")
@@ -90,26 +103,13 @@ with col2:
 
 st.markdown("---")
 
-# ── 내 기록 ──
-st.markdown("### 🏅 My Sessions")
-if st.session_state.plogging_logs:
-    my_df = pd.DataFrame(st.session_state.plogging_logs)
-    my_waste = my_df["waste_kg"].sum()
-    my_distance = my_df["distance_km"].sum()
-
-    col1, col2, col3 = st.columns(3)
-    col1.metric("My Total Waste", f"{my_waste:.1f} kg")
-    col2.metric("My Total Distance", f"{my_distance:.1f} km")
-    col3.metric("My Sessions", len(st.session_state.plogging_logs))
-
-    st.dataframe(my_df, use_container_width=True)
-
-    # 기여도
-    contribution_pct = (my_waste / total_waste) * 100
-    st.progress(min(contribution_pct/100, 1.0))
-    st.caption(f"Your contribution: {contribution_pct:.1f}% of all waste collected")
+# ── 전체 로그 ──
+st.markdown("### 🏅 All Sessions")
+if all_data:
+    log_df = pd.DataFrame(all_data)[["date", "course", "waste_kg", "distance_km", "waste_types"]]
+    st.dataframe(log_df, use_container_width=True)
 else:
-    st.info("No personal sessions yet. Log your first plogging session above! 🏃")
+    st.info("No real sessions yet. Be the first to log your plogging! 🏃")
 
 st.markdown("---")
 
@@ -117,14 +117,11 @@ st.markdown("---")
 st.markdown("### 🌱 What Your Impact Means")
 col1, col2, col3 = st.columns(3)
 with col1:
-    trees = total_waste * 0.5
-    st.metric("🌳 Equivalent trees saved", f"{trees:.0f}")
+    st.metric("🌳 Equivalent trees saved", f"{total_waste * 0.5:.0f}")
 with col2:
-    plastic_bottles = int(total_waste / 0.025)
-    st.metric("🍶 Plastic bottles removed", f"{plastic_bottles:,}")
+    st.metric("🍶 Plastic bottles removed", f"{int(total_waste / 0.025):,}")
 with col3:
-    co2_kg = total_waste * 2.5
-    st.metric("💨 CO₂ equivalent reduced (kg)", f"{co2_kg:.1f}")
+    st.metric("💨 CO₂ equivalent reduced (kg)", f"{total_waste * 2.5:.1f}")
 
 st.markdown("---")
-st.markdown("*Demo data included for visualization. Real data accumulates as users log sessions.*")
+st.caption("Real data stored in Supabase. Demo data shown when no sessions logged yet.")
