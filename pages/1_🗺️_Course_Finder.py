@@ -240,7 +240,17 @@ if st.session_state.selected_course:
             ).add_to(m)
 
     if len(highlight_coords_list) > 1:
-        pass  # 경로 라인 제거
+        all_coords = [[course['lat'], course['lon']]] + highlight_coords_list
+        from folium.plugins import AntPath
+        AntPath(
+            locations=all_coords,
+            color="#2D6A4F",
+            weight=4,
+            opacity=0.8,
+            delay=800,
+            dash_array=[10, 20],
+            pulse_color="#52B788"
+        ).add_to(m)
 
     if st.session_state.restaurants:
         for r in st.session_state.restaurants[:4]:
