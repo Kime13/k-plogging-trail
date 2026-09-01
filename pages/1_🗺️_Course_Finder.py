@@ -71,7 +71,6 @@ h3 { color: #2D6A4F; }
 </style>
 """, unsafe_allow_html=True)
 
-# 지역별 데이터 매핑
 REGION_DATA = {
     "🌿 Jeju": {
         "courses": JEJU_OLLE_COURSES,
@@ -90,7 +89,6 @@ REGION_DATA = {
     },
 }
 
-# session_state 초기화
 for key in ["selected_course", "route", "descriptions", "restaurants", "accommodations", "highlight_coords"]:
     if key not in st.session_state:
         st.session_state[key] = None if key != "descriptions" else {}
@@ -168,8 +166,8 @@ if st.session_state.selected_course:
         st.rerun()
 
     theme_emoji = {"coastal": "🌊", "island": "🏝️", "forest": "🌲", "rural": "🌾",
-                   "urban": "🏙️", "history": "🏯", "river": "🌊", "nature": "🌿",
-                   "beach": "🏖️", "heritage": "🏛️", "mountain": "⛰️"}
+                   "urban": "🏙️", "mountain": "⛰️", "nature": "🌿", "park": "🌳",
+                   "beach": "🏖️", "heritage": "🏛️"}
 
     st.markdown(f"""
     <div class='course-header'>
@@ -198,7 +196,7 @@ if st.session_state.selected_course:
 
     st.markdown("---")
 
-    # TourAPI 데이터 먼저 로드
+    # TourAPI 먼저 로드
     if st.session_state.restaurants is None:
         with st.spinner("Loading nearby spots..."):
             st.session_state.restaurants = get_nearby_restaurants(course["lat"], course["lon"])
@@ -218,6 +216,7 @@ if st.session_state.selected_course:
 
     m = folium.Map(location=[center_lat, center_lon], zoom_start=13, tiles="OpenStreetMap")
 
+    # 시작점
     folium.CircleMarker(
         location=[course['lat'], course['lon']],
         radius=14, color="white", fill=True,
@@ -226,6 +225,7 @@ if st.session_state.selected_course:
         tooltip=f"🚩 Start: {course['start_en']}"
     ).add_to(m)
 
+    # 하이라이트 핀
     colors = ["blue", "purple", "orange", "red", "darkblue"]
     highlight_coords_list = []
     for i, highlight in enumerate(course['highlights_en']):
@@ -239,19 +239,26 @@ if st.session_state.selected_course:
                 icon=folium.Icon(color=colors[i % len(colors)], icon="star", prefix="fa")
             ).add_to(m)
 
+    # 화살표 라인
     if len(highlight_coords_list) > 1:
         all_coords = [[course['lat'], course['lon']]] + highlight_coords_list
-        from folium.plugins import AntPath
-        AntPath(
-            locations=all_coords,
-            color="#2D6A4F",
-            weight=4,
-            opacity=0.8,
-            delay=800,
-            dash_array=[10, 20],
-            pulse_color="#52B788"
-        ).add_to(m)
+        for i in range(len(all_coords) - 1):
+            folium.PolyLine(
+                [all_coords[i], all_coords[i+1]],
+                color="#2D6A4F", weight=3, opacity=0.8
+            ).add_to(m)
+            mid_lat = (all_coords[i][0] + all_coords[i+1][0]) / 2
+            mid_lon = (all_coords[i][1] + all_coords[i+1][1]) / 2
+            folium.Marker(
+                location=[mid_lat, mid_lon],
+                icon=folium.DivIcon(
+                    html='<div style="font-size:20px;color:#2D6A4F;font-weight:bold;text-shadow:1px 1px 2px white;">→</div>',
+                    icon_size=(24, 24),
+                    icon_anchor=(12, 12)
+                )
+            ).add_to(m)
 
+    # 음식점 핀
     if st.session_state.restaurants:
         for r in st.session_state.restaurants[:4]:
             p = format_place(r)
@@ -266,6 +273,7 @@ if st.session_state.selected_course:
                 except:
                     pass
 
+    # 숙박 핀
     if st.session_state.accommodations:
         for a in st.session_state.accommodations[:4]:
             p = format_place(a)
@@ -280,25 +288,26 @@ if st.session_state.selected_course:
                 except:
                     pass
 
+    # 범례
     legend_html = """
     <div style='position:fixed;bottom:30px;left:50px;z-index:1000;
                 background:white;padding:10px 14px;border-radius:8px;
                 border:1px solid #ccc;font-size:12px;line-height:2;
                 box-shadow:2px 2px 6px rgba(0,0,0,0.15)'>
-        🟢 Start Point<br>⭐ Highlights<br>🔴 Restaurants<br>🔵 Accommodations
+        🟢 Start Point<br>⭐ Highlights<br>→ Route Direction<br>🔴 Restaurants<br>🔵 Accommodations
     </div>
     """
     m.get_root().html.add_child(folium.Element(legend_html))
     st_folium(m, width=None, height=450, returned_objects=[])
 
-    # 공식 지도 링크 버튼
+    # 공식 지도 버튼
     map_col1, map_col2 = st.columns(2)
     with map_col1:
         if course.get("official_map_url"):
             st.markdown(f"""
             <a href='{course["official_map_url"]}' target='_blank'>
                 <button style='width:100%;background:#2D6A4F;color:white;border:none;
-                              padding:10px;border-radius:8px;cursor:pointer;font-size:0.9rem;'>
+                              padding:10px;border-radius:8px;cursor:pointer;font-size:0.9rem;margin-top:8px'>
                     🗺️ Smart Seoul Map
                 </button>
             </a>
@@ -308,12 +317,23 @@ if st.session_state.selected_course:
             st.markdown(f"""
             <a href='{course["kakao_map_url"]}' target='_blank'>
                 <button style='width:100%;background:#FEE500;color:#3C1E1E;border:none;
-                              padding:10px;border-radius:8px;cursor:pointer;font-size:0.9rem;'>
+                              padding:10px;border-radius:8px;cursor:pointer;font-size:0.9rem;margin-top:8px'>
                     🗺️ KakaoMap
                 </button>
             </a>
             """, unsafe_allow_html=True)
-            
+
+    # 올레길 공식 지도 버튼
+    if course.get("official_map_url") and "jejuolle" in course.get("official_map_url", ""):
+        st.markdown(f"""
+        <a href='{course["official_map_url"]}' target='_blank'>
+            <button style='width:100%;background:#0066CC;color:white;border:none;
+                          padding:10px;border-radius:8px;cursor:pointer;font-size:0.9rem;margin-top:8px'>
+                🗺️ Jeju Olle Official Map
+            </button>
+        </a>
+        """, unsafe_allow_html=True)
+
     st.markdown("---")
 
     col1, col2 = st.columns([1, 1])
@@ -351,6 +371,7 @@ if st.session_state.selected_course:
             unsafe_allow_html=True
         )
 
+    # After Your Plogging
     st.markdown("---")
     st.markdown("### 🍽️ After Your Plogging")
     st.caption("Nearby spots powered by 한국관광공사 OpenAPI")
@@ -414,8 +435,7 @@ else:
                 for i, course in enumerate(theme_courses[:3]):
                     with cols[i % 3]:
                         diff_color = {"Easy": "#2D6A4F", "Moderate": "#856404", "Challenge": "#842029"}[course['difficulty']]
-                        st.markdown(f"""
-                        <div style='background:white;border-radius:12px;padding:16px;
+                        st.markdown(f"""<div style='background:white;border-radius:12px;padding:16px;
                                     border:1px solid #D4C9B8;margin-bottom:8px;
                                     box-shadow:0 2px 8px rgba(0,0,0,0.06);min-height:140px'>
                             <div style='font-weight:700;color:#2D6A4F;margin-bottom:6px'>{course['name_en']}</div>
@@ -426,8 +446,7 @@ else:
                                 <span style='color:{diff_color};font-weight:600'>{course['difficulty']}</span>
                                 {'&nbsp; 🐾' if course['pet_friendly'] else ''}
                             </div>
-                        </div>
-                        """, unsafe_allow_html=True)
+                        </div>""", unsafe_allow_html=True)
                         if st.button(f"View Route →", key=f"btn_{course['id']}"):
                             st.session_state.selected_course = course
                             st.session_state.highlight_coords = region_info["coords"]
