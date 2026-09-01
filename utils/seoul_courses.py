@@ -11,7 +11,9 @@ SEOUL_COURSES = [
         "highlights_en": ["Yongma Skywalk", "Mangu History Culture Park", "Yongmasan Mountain"],
         "description_en": "A well-maintained urban mountain trail connecting Yongmasan and Mangwusan. The newly opened Yongma Skywalk offers breathtaking 360° panoramic views of Seoul's cityscape.",
         "pet_friendly": False,
-        "plogging_tip": "Mountain trails collect wind-blown litter — check both sides of the trail carefully!"
+        "plogging_tip": "Mountain trails collect wind-blown litter — check both sides of the trail carefully!",
+        "official_map_url": "https://map.seoul.go.kr/smgis2/short/6OWQ1",
+        "kakao_map_url": "https://map.kakao.com/?urlX=524759&urlY=1140255&urlLevel=3&itemId=26558581&q=%EC%84%9C%EC%9A%B8%EB%91%98%EB%A0%88%EA%B8%B8%204%EC%BD%94%EC%8A%A4%20%EB%8F%84%EC%8B%9C%EB%A5%BC%20%EB%B2%97%EC%96%B4%EB%82%98%20%EB%A7%8C%EB%82%98%EB%8A%94%20%EA%B8%B8&srcid=26558581&map_type=TYPE_MAP",
     },
     {
         "id": "seoul_2",
@@ -25,7 +27,9 @@ SEOUL_COURSES = [
         "highlights_en": ["Achasan Sunrise Plaza", "Goguryeo Pavilion", "Achasan Mountain"],
         "description_en": "Walk the historic ridge of Achasan with panoramic Han River views. Rich in Goguryeo-era fortress ruins, this culturally significant 4.6km trail connects ancient history with modern Seoul.",
         "pet_friendly": False,
-        "plogging_tip": "Historic fortress ruins surround the trail — keep this culturally significant site pristine!"
+        "plogging_tip": "Historic fortress ruins surround the trail — keep this culturally significant site pristine!",
+        "official_map_url": "https://map.seoul.go.kr/smgis2/short/6OWH2",
+        "kakao_map_url": "https://map.kakao.com/?urlX=522392&urlY=1128303&urlLevel=3&itemId=26558421&q=%EC%84%9C%EC%9A%B8%EB%91%98%EB%A0%88%EA%B8%B8%205%EC%BD%94%EC%8A%A4%20%EC%82%AC%EB%9E%8C%EA%B3%BC%20%EC%97%AD%EC%82%AC%EB%A5%BC%20%EC%9E%87%EB%8A%94%20%EA%B8%B8&srcid=26558421&map_type=TYPE_MAP",
     },
     {
         "id": "seoul_3",
@@ -39,21 +43,25 @@ SEOUL_COURSES = [
         "highlights_en": ["Daemo Mountain Entrance", "Guryongsan Mountain", "Maeheon Citizens Forest"],
         "description_en": "A rewarding forest trail through two connected mountains in southern Seoul. End at the beautiful Maeheon Citizens Forest with its historic memorial to independence hero Yun Bong-gil.",
         "pet_friendly": True,
-        "plogging_tip": "Dense forest sections hide litter under fallen leaves — bring a grabber tool!"
+        "plogging_tip": "Dense forest sections hide litter under fallen leaves — bring a grabber tool!",
+        "official_map_url": "https://map.seoul.go.kr/smgis2/short/6OWQZ",
+        "kakao_map_url": "https://map.kakao.com/?urlX=515170&urlY=1103312&urlLevel=3&itemId=1302631567&q=%EC%84%9C%EC%9A%B8%EB%91%98%EB%A0%88%EA%B8%B8%209%EC%BD%94%EC%8A%A4%20%EC%9E%90%EC%97%B0%EC%83%9D%ED%83%9C%20%EC%9C%A0%EB%9E%8C%EA%B8%B8&srcid=1302631567&map_type=TYPE_MAP",
     },
     {
         "id": "seoul_4",
         "name": "서울둘레길 15코스 노을·하늘공원",
         "name_en": "Seoul Dulegil Route 15 - Noeul & Haneul Park",
-        "start": "가양역", "end": "증산역",
-        "start_en": "Gayang Station", "end_en": "Jeungsan Station",
-        "distance_km": 6.2, "difficulty": "Easy", "duration_hours": 2.5,
-        "lat": 37.5614, "lon": 126.8544,
+        "start": "가양대교 남단", "end": "증산역",
+        "start_en": "Gayang Bridge South", "end_en": "Jeungsan Station",
+        "distance_km": 7.7, "difficulty": "Easy", "duration_hours": 2.5,
+        "lat": 37.5637, "lon": 126.8565,
         "theme": "park",
         "highlights_en": ["Noeul Park", "Haneul Park", "World Cup Park"],
         "description_en": "Walk through Seoul's iconic ecological parks built on a former landfill. The silver grass fields of Haneul Park and stunning sunset views over the Han River make this an unforgettable plogging experience.",
         "pet_friendly": True,
-        "plogging_tip": "Popular weekend picnic destination — morning plogging yields the most waste after busy weekends!"
+        "plogging_tip": "Popular weekend picnic destination — morning plogging yields the most waste after busy weekends!",
+        "official_map_url": "https://map.seoul.go.kr/smgis2/short/6OX1j",
+        "kakao_map_url": "https://map.kakao.com/?urlX=474792&urlY=1128983&urlLevel=3&itemId=1697606941&q=%EC%84%9C%EC%9A%B8%EB%91%98%EB%A0%88%EA%B8%B8%2015%EC%BD%94%EC%8A%A4%20%EB%B3%B5%EC%9B%90%EB%90%9C%20%EC%9E%90%EC%97%B0%EA%B8%B8&srcid=1697606941&map_type=TYPE_MAP",
     },
 ]
 

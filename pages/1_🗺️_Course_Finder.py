@@ -284,6 +284,29 @@ if st.session_state.selected_course:
     m.get_root().html.add_child(folium.Element(legend_html))
     st_folium(m, width=None, height=450, returned_objects=[])
 
+    # 공식 지도 링크 버튼
+    map_col1, map_col2 = st.columns(2)
+    with map_col1:
+        if course.get("official_map_url"):
+            st.markdown(f"""
+            <a href='{course["official_map_url"]}' target='_blank'>
+                <button style='width:100%;background:#2D6A4F;color:white;border:none;
+                              padding:10px;border-radius:8px;cursor:pointer;font-size:0.9rem;'>
+                    🗺️ Smart Seoul Map
+                </button>
+            </a>
+            """, unsafe_allow_html=True)
+    with map_col2:
+        if course.get("kakao_map_url"):
+            st.markdown(f"""
+            <a href='{course["kakao_map_url"]}' target='_blank'>
+                <button style='width:100%;background:#FEE500;color:#3C1E1E;border:none;
+                              padding:10px;border-radius:8px;cursor:pointer;font-size:0.9rem;'>
+                    🗺️ KakaoMap
+                </button>
+            </a>
+            """, unsafe_allow_html=True)
+            
     st.markdown("---")
 
     col1, col2 = st.columns([1, 1])
