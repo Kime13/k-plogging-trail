@@ -240,10 +240,7 @@ if st.session_state.selected_course:
             ).add_to(m)
 
     if len(highlight_coords_list) > 1:
-        folium.PolyLine(
-            [[course['lat'], course['lon']]] + highlight_coords_list,
-            color="#2D6A4F", weight=3, opacity=0.8, dash_array="6"
-        ).add_to(m)
+        pass  # 경로 라인 제거
 
     if st.session_state.restaurants:
         for r in st.session_state.restaurants[:4]:

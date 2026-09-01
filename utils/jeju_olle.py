@@ -61,7 +61,7 @@ JEJU_OLLE_COURSES = [
         "distance_km": 11.0, "difficulty": "Easy", "duration_hours": 3,
         "lat": 33.2525, "lon": 126.6234,
         "theme": "coastal",
-        "highlights_en": ["Oedolgae Rock", "Hwanguji Coast", "Beophan Port"],
+        "highlights_en": ["Hwanguji Coast", "Beophan Port", "Oedolgae Rock"],
         "description_en": "This popular route features the iconic Oedolgae sea stack and stunning southern coastal scenery. One of the most photographed sections of the entire Olle trail.",
         "pet_friendly": True,
         "plogging_tip": "Popular tourist area — coordinate with other visitors for a group plogging session!"
@@ -73,7 +73,7 @@ JEJU_OLLE_COURSES = [
         "distance_km": 8.4, "difficulty": "Easy", "duration_hours": 2.5,
         "lat": 33.2372, "lon": 126.3616,
         "theme": "coastal",
-        "highlights_en": ["Hwasun Gold Sand Beach", "Sanbangsan Viewpoint"],
+        "highlights_en": ["Sanbangsan Viewpoint", "Hwasun Gold Sand Beach"],
         "description_en": "A short and sweet coastal route ending at the stunning Hwasun Gold Sand Beach. Perfect for a half-day plogging session with amazing views of Sanbangsan.",
         "pet_friendly": True,
         "plogging_tip": "Sandy beaches trap microplastics — every piece you collect makes a huge difference!"
