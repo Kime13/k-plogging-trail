@@ -239,24 +239,6 @@ if st.session_state.selected_course:
                 icon=folium.Icon(color=colors[i % len(colors)], icon="star", prefix="fa")
             ).add_to(m)
 
-    # 화살표 라인
-    if len(highlight_coords_list) > 1:
-        all_coords = [[course['lat'], course['lon']]] + highlight_coords_list
-        for i in range(len(all_coords) - 1):
-            folium.PolyLine(
-                [all_coords[i], all_coords[i+1]],
-                color="#2D6A4F", weight=3, opacity=0.8
-            ).add_to(m)
-            mid_lat = (all_coords[i][0] + all_coords[i+1][0]) / 2
-            mid_lon = (all_coords[i][1] + all_coords[i+1][1]) / 2
-            folium.Marker(
-                location=[mid_lat, mid_lon],
-                icon=folium.DivIcon(
-                    html='<div style="font-size:20px;color:#2D6A4F;font-weight:bold;text-shadow:1px 1px 2px white;">→</div>',
-                    icon_size=(24, 24),
-                    icon_anchor=(12, 12)
-                )
-            ).add_to(m)
 
     # 음식점 핀
     if st.session_state.restaurants:
@@ -300,15 +282,30 @@ if st.session_state.selected_course:
     m.get_root().html.add_child(folium.Element(legend_html))
     st_folium(m, width=None, height=450, returned_objects=[])
 
+
     # 공식 지도 버튼
+    st.markdown("#### 🗺️ View Official Route Map")
+    st.caption("Our map shows key highlights. For the exact trail route, use the official maps below.")
     map_col1, map_col2 = st.columns(2)
     with map_col1:
         if course.get("official_map_url"):
             st.markdown(f"""
             <a href='{course["official_map_url"]}' target='_blank'>
                 <button style='width:100%;background:#2D6A4F;color:white;border:none;
-                              padding:10px;border-radius:8px;cursor:pointer;font-size:0.9rem;margin-top:8px'>
-                    🗺️ Smart Seoul Map
+                              padding:12px;border-radius:8px;cursor:pointer;font-size:1rem;
+                              font-weight:600;margin-top:4px'>
+                    🗺️ Smart Seoul Map (Official)
+                </button>
+            </a>
+            """, unsafe_allow_html=True)
+        elif course.get("id") and str(course["id"]) in ["1", "1-1", "6", "9", "14", "21"]:
+            olle_id = str(course["id"]).zfill(2)
+            st.markdown(f"""
+            <a href='https://www.jejuolle.org/trail#/road/{olle_id}' target='_blank'>
+                <button style='width:100%;background:#0066CC;color:white;border:none;
+                              padding:12px;border-radius:8px;cursor:pointer;font-size:1rem;
+                              font-weight:600;margin-top:4px'>
+                    🌿 Jeju Olle Official Map
                 </button>
             </a>
             """, unsafe_allow_html=True)
@@ -317,7 +314,8 @@ if st.session_state.selected_course:
             st.markdown(f"""
             <a href='{course["kakao_map_url"]}' target='_blank'>
                 <button style='width:100%;background:#FEE500;color:#3C1E1E;border:none;
-                              padding:10px;border-radius:8px;cursor:pointer;font-size:0.9rem;margin-top:8px'>
+                              padding:12px;border-radius:8px;cursor:pointer;font-size:1rem;
+                              font-weight:600;margin-top:4px'>
                     🗺️ KakaoMap
                 </button>
             </a>
@@ -435,19 +433,21 @@ else:
                 for i, course in enumerate(theme_courses[:3]):
                     with cols[i % 3]:
                         diff_color = {"Easy": "#2D6A4F", "Moderate": "#856404", "Challenge": "#842029"}[course['difficulty']]
-                        st.markdown(f"""<div style='background:white;border-radius:12px;padding:16px;
-                                    border:1px solid #D4C9B8;margin-bottom:8px;
-                                    box-shadow:0 2px 8px rgba(0,0,0,0.06);min-height:140px'>
-                            <div style='font-weight:700;color:#2D6A4F;margin-bottom:6px'>{course['name_en']}</div>
-                            <div style='font-size:0.82rem;color:#666;margin-bottom:10px'>{course['description_en'][:80]}...</div>
-                            <div style='font-size:0.8rem;'>
-                                📏 {course['distance_km']}km &nbsp;
-                                ⏱️ {course['duration_hours']}h &nbsp;
-                                <span style='color:{diff_color};font-weight:600'>{course['difficulty']}</span>
-                                {'&nbsp; 🐾' if course['pet_friendly'] else ''}
-                            </div>
-                        </div>""", unsafe_allow_html=True)
-                        if st.button(f"View Route →", key=f"btn_{course['id']}"):
+                        pet_icon = "🐾" if course['pet_friendly'] else ""
+                        st.markdown(
+                            f"<div style='background:white;border-radius:12px;padding:16px;"
+                            f"border:1px solid #D4C9B8;margin-bottom:8px;"
+                            f"box-shadow:0 2px 8px rgba(0,0,0,0.06);min-height:140px'>"
+                            f"<div style='font-weight:700;color:#2D6A4F;margin-bottom:6px'>{course['name_en']}</div>"
+                            f"<div style='font-size:0.82rem;color:#666;margin-bottom:10px'>{course['description_en'][:80]}...</div>"
+                            f"<div style='font-size:0.8rem;'>📏 {course['distance_km']}km &nbsp;"
+                            f"⏱️ {course['duration_hours']}h &nbsp;"
+                            f"<span style='color:{diff_color};font-weight:600'>{course['difficulty']}</span>"
+                            f"&nbsp;{pet_icon}</div>"
+                            f"</div>",
+                            unsafe_allow_html=True
+                        )
+                        if st.button("View Route →", key=f"btn_{course['id']}"):
                             st.session_state.selected_course = course
                             st.session_state.highlight_coords = region_info["coords"]
                             st.session_state.route = None
