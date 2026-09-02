@@ -9,9 +9,11 @@ BUSAN_COURSES = [
         "lat": 35.3189, "lon": 129.2643,
         "theme": "coastal",
         "highlights_en": ["Imrang Beach", "Ilgwang Beach", "Gijang County Office"],
-        "description_en": "Walk along Busan's pristine northeastern coastline through nine historic fishing harbors. Pass the silver-pine forest of Imrang Beach and the charming village of Ilgwang, the setting of novelist Oh Young-su's 'Gaetmaeul'.",
+        "description_en": "Walk along Busan's pristine northeastern coastline through nine historic fishing harbors. Pass the silver-pine forest of Imrang Beach and the charming village of Ilgwang.",
         "pet_friendly": True,
-        "plogging_tip": "Remote northeastern fishing villages — your cleanup directly protects the local marine ecosystem!"
+        "plogging_tip": "Remote northeastern fishing villages — your cleanup directly protects the local marine ecosystem!",
+        "official_map_url": "https://www.busan.go.kr/galmaetgil/tour0101",
+        "kakao_map_url": "https://map.kakao.com/?map_type=TYPE_MAP&q=%EA%B0%88%EB%A7%B7%EA%B8%B81%EC%BD%94%EC%8A%A41%EA%B5%AC%EA%B0%84&urlLevel=7&urlX=1009860&urlY=501207",
     },
     {
         "id": "busan_2",
@@ -23,9 +25,11 @@ BUSAN_COURSES = [
         "lat": 35.1040, "lon": 129.0351,
         "theme": "heritage",
         "highlights_en": ["40 Stairs Cultural Street", "Jagalchi Fish Market", "Yeongdo Bridge"],
-        "description_en": "Walk Busan's living history along the iconic Sanbok hillside road with 100-year-old Busan Port views, down through the 40 Stairs refugee district, past the vibrant Jagalchi Fish Market to the historic Yeongdo drawbridge.",
+        "description_en": "Walk Busan's living history along the iconic Sanbok hillside road with 100-year-old Busan Port views, down through the 40 Stairs refugee district to the historic Yeongdo drawbridge.",
         "pet_friendly": False,
-        "plogging_tip": "Busy market and hillside area — early morning plogging makes the biggest impact!"
+        "plogging_tip": "Busy market and hillside area — early morning plogging makes the biggest impact!",
+        "official_map_url": "https://www.busan.go.kr/galmaetgil/tour0302",
+        "kakao_map_url": "https://map.kakao.com/?map_type=TYPE_MAP&q=%EA%B0%88%EB%A7%B7%EA%B8%B83%EC%BD%94%EC%8A%A42%EA%B5%AC%EA%B0%84&urlLevel=7&urlX=966360&urlY=452545",
     },
     {
         "id": "busan_3",
@@ -37,9 +41,11 @@ BUSAN_COURSES = [
         "lat": 35.0586, "lon": 129.0157,
         "theme": "coastal",
         "highlights_en": ["Songdo Beach", "Songdo Cloud Bridge", "Gamcheon Port"],
-        "description_en": "Experience Busan's dramatic southern coastline from scenic Amnam Park through Korea's first public beach (opened 1913) across the spectacular Songdo Cloud Bridge suspended above the sea.",
+        "description_en": "Experience Busan's dramatic southern coastline from scenic Amnam Park through Korea's first public beach across the spectacular Songdo Cloud Bridge suspended above the sea.",
         "pet_friendly": True,
-        "plogging_tip": "Historic coastal path — every piece of litter you collect protects this century-old beach heritage!"
+        "plogging_tip": "Historic coastal path — every piece of litter you collect protects this century-old beach heritage!",
+        "official_map_url": "https://www.busan.go.kr/galmaetgil/tour0401",
+        "kakao_map_url": "https://map.kakao.com/?map_type=TYPE_MAP&q=%EA%B0%88%EB%A7%B7%EA%B8%B84%EC%BD%94%EC%8A%A41%EA%B5%AC%EA%B0%84&urlLevel=6&urlX=959980&urlY=442415",
     },
     {
         "id": "busan_4",
@@ -51,26 +57,24 @@ BUSAN_COURSES = [
         "lat": 35.1585, "lon": 129.1599,
         "theme": "beach",
         "highlights_en": ["Haeundae Beach", "Dalmaji Hill", "Gwangalli Beach"],
-        "description_en": "Busan's most iconic beach-to-beach plogging route. Climb the romantic Dalmaji Hill for panoramic sea views between Korea's two most famous urban beaches with the Gwangan Diamond Bridge as your backdrop.",
+        "description_en": "Busan's most iconic beach-to-beach plogging route. Climb the romantic Dalmaji Hill for panoramic sea views between Korea's two most famous urban beaches.",
         "pet_friendly": True,
-        "plogging_tip": "Korea's most visited beaches — your plogging here has maximum visibility and impact!"
+        "plogging_tip": "Korea's most visited beaches — your plogging here has maximum visibility and impact!",
+        "official_map_url": "https://www.busan.go.kr/galmaetgil/tour0802",
+        "kakao_map_url": "https://map.kakao.com/?map_type=TYPE_MAP&q=%EA%B0%88%EB%A7%B7%EA%B8%B88%EC%BD%94%EC%8A%A42%EA%B5%AC%EA%B0%84&urlLevel=7&urlX=983840&urlY=475365",
     },
 ]
 
 BUSAN_HIGHLIGHT_COORDS = {
-    # 1-1구간 임랑~기장
     "Imrang Beach": [35.3189, 129.2643],
     "Ilgwang Beach": [35.2987, 129.2601],
     "Gijang County Office": [35.2444, 129.2224],
-    # 3-2구간 산복도로~자갈치
     "40 Stairs Cultural Street": [35.1040, 129.0351],
     "Jagalchi Fish Market": [35.0966, 129.0306],
     "Yeongdo Bridge": [35.0955, 129.0365],
-    # 4-1구간 암남공원~감천항
     "Songdo Beach": [35.0759, 129.0170],
     "Songdo Cloud Bridge": [35.0619, 129.0220],
     "Gamcheon Port": [35.0812, 128.9992],
-    # 8-2구간 해운대~광안리
     "Haeundae Beach": [35.1585, 129.1599],
     "Dalmaji Hill": [35.1647, 129.1867],
     "Gwangalli Beach": [35.1532, 129.1190],
