@@ -322,17 +322,7 @@ if st.session_state.selected_course:
                 </button>
             </a>
             """, unsafe_allow_html=True)
-            
-    # 올레길 공식 지도 버튼
-    if course.get("official_map_url") and "jejuolle" in course.get("official_map_url", ""):
-        st.markdown(f"""
-        <a href='{course["official_map_url"]}' target='_blank'>
-            <button style='width:100%;background:#0066CC;color:white;border:none;
-                          padding:10px;border-radius:8px;cursor:pointer;font-size:0.9rem;margin-top:8px'>
-                🗺️ Jeju Olle Official Map
-            </button>
-        </a>
-        """, unsafe_allow_html=True)
+
 
     st.markdown("---")
 
