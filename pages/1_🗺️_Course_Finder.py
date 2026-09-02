@@ -283,29 +283,31 @@ if st.session_state.selected_course:
     st_folium(m, width=None, height=450, returned_objects=[])
 
 
-    # 공식 지도 버튼
+       # 공식 지도 버튼
     st.markdown("#### 🗺️ View Official Route Map")
     st.caption("Our map shows key highlights. For the exact trail route, use the official maps below.")
     map_col1, map_col2 = st.columns(2)
     with map_col1:
         if course.get("official_map_url"):
+            # 지역별 버튼 텍스트/색상 구분
+            if "seoul.go.kr" in course["official_map_url"]:
+                btn_label = "🗺️ Smart Seoul Map (Official)"
+                btn_color = "#2D6A4F"
+                btn_text_color = "white"
+            elif "busan.go.kr" in course["official_map_url"]:
+                btn_label = "🗺️ Galmaetgil Official Site"
+                btn_color = "#0066CC"
+                btn_text_color = "white"
+            else:
+                btn_label = "🗺️ Official Map"
+                btn_color = "#2D6A4F"
+                btn_text_color = "white"
             st.markdown(f"""
             <a href='{course["official_map_url"]}' target='_blank'>
-                <button style='width:100%;background:#2D6A4F;color:white;border:none;
+                <button style='width:100%;background:{btn_color};color:{btn_text_color};border:none;
                               padding:12px;border-radius:8px;cursor:pointer;font-size:1rem;
                               font-weight:600;margin-top:4px'>
-                    🗺️ Smart Seoul Map (Official)
-                </button>
-            </a>
-            """, unsafe_allow_html=True)
-        elif course.get("id") and str(course["id"]) in ["1", "1-1", "6", "9", "14", "21"]:
-            olle_id = str(course["id"]).zfill(2)
-            st.markdown(f"""
-            <a href='https://www.jejuolle.org/trail#/road/{olle_id}' target='_blank'>
-                <button style='width:100%;background:#0066CC;color:white;border:none;
-                              padding:12px;border-radius:8px;cursor:pointer;font-size:1rem;
-                              font-weight:600;margin-top:4px'>
-                    🌿 Jeju Olle Official Map
+                    {btn_label}
                 </button>
             </a>
             """, unsafe_allow_html=True)
@@ -320,7 +322,7 @@ if st.session_state.selected_course:
                 </button>
             </a>
             """, unsafe_allow_html=True)
-
+            
     # 올레길 공식 지도 버튼
     if course.get("official_map_url") and "jejuolle" in course.get("official_map_url", ""):
         st.markdown(f"""
