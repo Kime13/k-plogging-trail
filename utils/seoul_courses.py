@@ -67,13 +67,13 @@ SEOUL_COURSES = [
 
 SEOUL_HIGHLIGHT_COORDS = {
     # 4코스 망우·용마산
-    "Yongma Skywalk": [37.5829, 127.1032],
     "Mangu History Culture Park": [37.5989, 127.1144],
-    "Yongmasan Mountain": [37.5829, 127.1032],
+    "Yongmasan Mountain": [37.5711, 127.0958],
+    "Yongma Skywalk": [37.5829, 127.1032],
     # 5코스 아차산
+    "Achasan Mountain": [37.5522, 127.0896],
     "Achasan Sunrise Plaza": [37.5601, 127.1016],
     "Goguryeo Pavilion": [37.5582, 127.1022],
-    "Achasan Mountain": [37.5522, 127.0896],
     # 9코스 대모·구룡산
     "Daemo Mountain Entrance": [37.4915, 127.0731],
     "Guryongsan Mountain": [37.4689, 127.0616],

@@ -8,8 +8,8 @@ BUSAN_COURSES = [
         "distance_km": 11.5, "difficulty": "Easy", "duration_hours": 4,
         "lat": 35.3189, "lon": 129.2643,
         "theme": "coastal",
-        "highlights_en": ["Imrang Beach", "Ilgwang Beach", "Gijang County Office"],
-        "description_en": "Walk along Busan's pristine northeastern coastline through nine historic fishing harbors. Pass the silver-pine forest of Imrang Beach and the charming village of Ilgwang.",
+        "highlights_en": ["Imrang Beach", "Chilam Port", "Ilgwang Beach"],
+        "description_en": "Walk along Busan's pristine northeastern coastline through nine historic fishing harbors. Pass the famous three-colored lighthouses of Chilam Port and the charming village of Ilgwang.",
         "pet_friendly": True,
         "plogging_tip": "Remote northeastern fishing villages — your cleanup directly protects the local marine ecosystem!",
         "official_map_url": "https://www.busan.go.kr/galmaetgil/tour0101",
@@ -66,15 +66,19 @@ BUSAN_COURSES = [
 ]
 
 BUSAN_HIGHLIGHT_COORDS = {
+    # 1-1구간
     "Imrang Beach": [35.3189, 129.2643],
-    "Ilgwang Beach": [35.2987, 129.2601],
-    "Gijang County Office": [35.2444, 129.2224],
+    "Chilam Port": [35.2987, 129.2601],
+    "Ilgwang Beach": [35.2599, 129.2338],
+    # 3-2구간
     "40 Stairs Cultural Street": [35.1040, 129.0351],
     "Jagalchi Fish Market": [35.0966, 129.0306],
     "Yeongdo Bridge": [35.0955, 129.0365],
+    # 4-1구간
     "Songdo Beach": [35.0759, 129.0170],
     "Songdo Cloud Bridge": [35.0619, 129.0220],
     "Gamcheon Port": [35.0812, 128.9992],
+    # 8-2구간
     "Haeundae Beach": [35.1585, 129.1599],
     "Dalmaji Hill": [35.1647, 129.1867],
     "Gwangalli Beach": [35.1532, 129.1190],
