@@ -80,7 +80,7 @@ JEJU_OLLE_COURSES = [
         "pet_friendly": True,
         "plogging_tip": "Sandy beaches and volcanic coastal paths — bring extra bags for marine debris!",
         "official_map_url": "https://www.jejuolle.org/trail#/road/10",
-        "kakao_map_url": ""kakao_map_url": "https://map.kakao.com/?urlX=334711.0000000014&urlY=-79995.99999999977&urlLevel=3&itemId=12753435&q=%EC%98%AC%EB%A0%88%EA%B8%B8%2010%EC%BD%94%EC%8A%A4(%ED%99%94%EC%88%9C-%EB%AA%A8%EC%8A%AC%ED%8F%AC%20%EC%98%AC%EB%A0%88)&srcid=12753435&map_type=TYPE_MAP",
+        "kakao_map_url": "https://map.kakao.com/?urlX=334711.0000000014&urlY=-79995.99999999977&urlLevel=3&itemId=12753435&q=%EC%98%AC%EB%A0%88%EA%B8%B8%2010%EC%BD%94%EC%8A%A4(%ED%99%94%EC%88%9C-%EB%AA%A8%EC%8A%AC%ED%8F%AC%20%EC%98%AC%EB%A0%88)&srcid=12753435&map_type=TYPE_MAP",
     },
     {
         "id": 14, "name": "올레 14코스", "name_en": "Olle Route 14 ⭐ Hyeopjae",
