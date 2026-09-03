@@ -71,8 +71,8 @@ SEOUL_HIGHLIGHT_COORDS = {
     "Yongmasan Mountain": [37.5711, 127.0958],
     "Yongma Skywalk": [37.5829, 127.1032],
     # 5코스 아차산
-    "Achasan Mountain": [37.5821, 127.0923],
-    "Achasan Sunrise Plaza": [37.5601, 127.1016],
+    "Achasan Mountain": [37.5524, 127.1027],
+    "Achasan Sunrise Plaza": [37.5560, 127.1019],
     "Goguryeo Pavilion": [37.5582, 127.1022],
     # 9코스 대모·구룡산
     "Daemo Mountain Entrance": [37.4915, 127.0731],
