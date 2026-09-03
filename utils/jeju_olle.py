@@ -13,16 +13,17 @@ HIGHLIGHT_COORDS = {
     "Oedolgae Rock": [33.2390, 126.5449],
     # 올레 10코스
     "Hwasun Gold Sand Beach": [33.2400, 126.3336],
-    "Sanbangsan Mountain": [33.2416, 126.3134],
+    "Yongmeori Coast": [33.2317, 126.3147],
     "Songaksan Mountain": [33.1991, 126.2898],
     # 올레 14코스
     "Hallim Park": [33.3902, 126.2397],
     "Hyeopjae Beach": [33.3943, 126.2397],
     "Biyangdo Island View": [33.4103, 126.2273],
     # 올레 21코스
+    "Byeolbangjin Fortress": [33.5268, 126.8829],
+    "Tokkiseom Island": [33.5246, 126.9026],
     "Jimibong Peak": [33.4993, 126.9024],
-    "Jongdal Coast": [33.4619, 126.9386],
-    "Udo Island View": [33.5142, 126.9576],
+    "Jongdal Badang": [33.4661, 126.9114],
 }
 
 JEJU_OLLE_COURSES = [
@@ -75,8 +76,8 @@ JEJU_OLLE_COURSES = [
         "distance_km": 15.5, "difficulty": "Moderate", "duration_hours": 4,
         "lat": 33.2400, "lon": 126.3336,
         "theme": "coastal",
-        "highlights_en": ["Hwasun Gold Sand Beach", "Sanbangsan Mountain", "Songaksan Mountain"],
-        "description_en": "Walk past the iconic Sanbangsan volcanic dome and the dramatic Songaksan crater overlooking Marado Island. This scenic coastal route captures the wild beauty of Jeju's southwestern tip.",
+        "highlights_en": ["Hwasun Gold Sand Beach", "Yongmeori Coast", "Songaksan Mountain"],
+        "description_en": "Walk past the iconic Yongmeori Coast and the dramatic Songaksan crater overlooking Marado Island. This scenic coastal route captures the wild beauty of Jeju's southwestern tip.",
         "pet_friendly": True,
         "plogging_tip": "Sandy beaches and volcanic coastal paths — bring extra bags for marine debris!",
         "official_map_url": "https://www.jejuolle.org/trail#/road/10",
@@ -98,15 +99,15 @@ JEJU_OLLE_COURSES = [
     },
     {
         "id": 21, "name": "올레 21코스", "name_en": "Olle Route 21 ⭐ Jimibong",
-        "start": "하도리", "end": "종달리",
-        "start_en": "Hado Village", "end_en": "Jongdal Village",
-        "distance_km": 11.7, "difficulty": "Easy", "duration_hours": 3,
+        "start": "하도리 해녀박물관", "end": "종달바당",
+        "start_en": "Hado Haenyeo Museum", "end_en": "Jongdal Badang",
+        "distance_km": 11.3, "difficulty": "Easy", "duration_hours": 3,
         "lat": 33.5199, "lon": 126.9009,
         "theme": "coastal",
-        "highlights_en": ["Jimibong Peak", "Jongdal Coast", "Udo Island View"],
-        "description_en": "Climb Jimibong for a spectacular view of Udo Island and the eastern coastline before descending to the tranquil Jongdal fishing village.",
+        "highlights_en": ["Byeolbangjin Fortress", "Tokkiseom Island", "Jimibong Peak", "Jongdal Badang"],
+        "description_en": "Walk from the Haenyeo Museum through the historic Byeolbangjin fortress, past the UNESCO-protected Tokkiseom Island, and climb Jimibong for panoramic views of eastern Jeju.",
         "pet_friendly": True,
-        "plogging_tip": "Short route but high impact — this pristine coast deserves your best plogging effort!",
+        "plogging_tip": "This pristine eastern coast deserves your best plogging effort!",
         "official_map_url": "https://www.jejuolle.org/trail#/road/21",
         "kakao_map_url": "https://map.kakao.com/?urlX=476981.9999999975&urlY=7301.99999999837&urlLevel=3&itemId=18502107&q=%EC%98%AC%EB%A0%88%EA%B8%B8%2021%EC%BD%94%EC%8A%A4&srcid=18502107&map_type=TYPE_MAP",
     },

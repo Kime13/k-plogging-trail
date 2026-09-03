@@ -422,7 +422,7 @@ else:
                     continue
                 st.markdown(f"### {theme_label}")
                 cols = st.columns(min(len(theme_courses), 3))
-                for i, course in enumerate(theme_courses[:3]):
+                for i, course in enumerate(theme_courses):
                     with cols[i % 3]:
                         diff_color = {"Easy": "#2D6A4F", "Moderate": "#856404", "Challenge": "#842029"}[course['difficulty']]
                         pet_icon = "🐾" if course['pet_friendly'] else ""
