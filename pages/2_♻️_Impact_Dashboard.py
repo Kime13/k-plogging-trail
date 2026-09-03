@@ -5,6 +5,9 @@ from supabase import create_client
 import os
 from dotenv import load_dotenv
 from utils.jeju_olle import JEJU_OLLE_COURSES
+from utils.seoul_courses import SEOUL_COURSES
+from utils.busan_courses import BUSAN_COURSES
+import plotly.express as px
 
 load_dotenv()
 
@@ -24,8 +27,12 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     log_date = st.date_input("Date", value=date.today())
 with col2:
-    course_options = [c["name_en"] for c in JEJU_OLLE_COURSES]
-    course_name = st.selectbox("Course", course_options)
+    all_courses = (
+        [c["name_en"] for c in JEJU_OLLE_COURSES] +
+        [c["name_en"] for c in SEOUL_COURSES] +
+        [c["name_en"] for c in BUSAN_COURSES]
+    )
+    course_name = st.selectbox("Course", all_courses)
 with col3:
     waste_kg = st.number_input("Waste collected (kg)", min_value=0.1, max_value=50.0, value=0.5, step=0.1)
 with col4:
@@ -63,7 +70,7 @@ except:
 DEMO_DATA = [
     {"date": "2026-08-01", "course": "Olle Route 1 ⭐ Best", "waste_kg": 1.2, "distance_km": 15.1, "waste_types": "Plastic bottles, Food packaging"},
     {"date": "2026-08-05", "course": "Olle Route 6 ⭐ Oedolgae", "waste_kg": 0.8, "distance_km": 11.0, "waste_types": "Cigarette butts, Plastic bottles"},
-    {"date": "2026-08-10", "course": "Olle Route 9 ⭐ Sanbangsan", "waste_kg": 0.5, "distance_km": 8.4, "waste_types": "Food packaging, Styrofoam"},
+    {"date": "2026-08-10", "course": "Olle Route 10 ⭐ Sanbangsan", "waste_kg": 0.5, "distance_km": 15.5, "waste_types": "Food packaging, Styrofoam"},
     {"date": "2026-08-15", "course": "Olle Route 14 ⭐ Hyeopjae", "waste_kg": 2.1, "distance_km": 19.5, "waste_types": "Plastic bottles, Metal cans"},
     {"date": "2026-08-20", "course": "Olle Route 21 ⭐ Jimibong", "waste_kg": 0.9, "distance_km": 11.7, "waste_types": "Cigarette butts, Food packaging"},
 ]
@@ -96,17 +103,33 @@ with col1:
     st.line_chart(chart_df.set_index("date")["cumulative_kg"])
 
 with col2:
-    st.markdown("### 🗺️ Top Courses by Impact")
-    course_df = df.groupby("course")["waste_kg"].sum().sort_values(ascending=False).reset_index()
+    st.markdown("### 🗺️ Top 10 Courses by Impact")
+    course_df = df.groupby("course")["waste_kg"].sum().sort_values(ascending=False).head(10).reset_index()
     course_df.columns = ["Course", "Waste (kg)"]
-    st.bar_chart(course_df.set_index("Course"))
+    course_df["Course"] = course_df["Course"].str[:20]
+    fig = px.bar(
+        course_df,
+        x="Waste (kg)",
+        y="Course",
+        orientation="h",
+        color_discrete_sequence=["#2D6A4F"]
+    )
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+        height=300,
+        yaxis=dict(tickfont=dict(size=11)),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("---")
 
-# ── 전체 로그 ──
-st.markdown("### 🏅 All Sessions")
+# ── 최근 세션 로그 (최대 50개) ──
+st.markdown("### 🏅 Recent Sessions")
 if all_data:
-    log_df = pd.DataFrame(all_data)[["date", "course", "waste_kg", "distance_km", "waste_types"]]
+    log_df = pd.DataFrame(all_data).tail(50)[["date", "course", "waste_kg", "distance_km", "waste_types"]]
+    log_df = log_df.sort_values("date", ascending=False)
     st.dataframe(log_df, use_container_width=True)
 else:
     st.info("No real sessions yet. Be the first to log your plogging! 🏃")
@@ -124,4 +147,4 @@ with col3:
     st.metric("💨 CO₂ equivalent reduced (kg)", f"{total_waste * 2.5:.1f}")
 
 st.markdown("---")
-st.caption("Real data stored in Supabase. Demo data shown when no sessions logged yet.")
+st.caption("Real data stored in Supabase. Top 10 courses shown. Recent 50 sessions displayed.")
