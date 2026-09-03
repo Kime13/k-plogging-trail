@@ -24,7 +24,7 @@ def get_nearby_attractions(lat, lon, radius=3000, content_type=12):
         "_type": "json"
     }
     try:
-        response = requests.get(url, params=params, timeout=5)
+        response = requests.get(url, params=params, timeout=3)
         data = response.json()
         items = data["response"]["body"]["items"]["item"]
         return items if isinstance(items, list) else [items]

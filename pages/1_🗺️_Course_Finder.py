@@ -197,11 +197,17 @@ if st.session_state.selected_course:
     st.markdown("---")
 
     # TourAPI 먼저 로드
+        # TourAPI 먼저 로드
     if st.session_state.restaurants is None:
-        with st.spinner("Loading nearby spots..."):
+        try:
             st.session_state.restaurants = get_nearby_restaurants(course["lat"], course["lon"])
+        except:
+            st.session_state.restaurants = []
     if st.session_state.accommodations is None:
-        st.session_state.accommodations = get_nearby_accommodations(course["lat"], course["lon"])
+        try:
+            st.session_state.accommodations = get_nearby_accommodations(course["lat"], course["lon"])
+        except:
+            st.session_state.accommodations = []
 
     # 지도
     st.markdown("### 🗺️ Route Map")
