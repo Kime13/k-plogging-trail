@@ -101,7 +101,7 @@ JEJU_OLLE_COURSES = [
         "start": "하도리 해녀박물관", "end": "종달바당",
         "start_en": "Hado Haenyeo Museum", "end_en": "Jongdal Badang",
         "distance_km": 11.3, "difficulty": "Easy", "duration_hours": 3,
-        "lat": 33.5199, "lon": 126.9009,
+        "lat": 33.5236, "lon": 126.8634,
         "theme": "coastal",
         "highlights_en": ["Byeolbangjin Fortress", "Hado Beach", "Jimibong Peak"],
         "description_en": "Walk from the Haenyeo Museum through the historic Byeolbangjin fortress, past the beautiful Hado Beach, and climb Jimibong for panoramic 360° views of eastern Jeju.",
