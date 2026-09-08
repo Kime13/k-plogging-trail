@@ -32,6 +32,7 @@ SEOUL_COURSES = [
         "kakao_map_url": "https://map.kakao.com/?urlX=522392&urlY=1128303&urlLevel=3&itemId=26558421&q=%EC%84%9C%EC%9A%B8%EB%91%98%EB%A0%88%EA%B8%B8%205%EC%BD%94%EC%8A%A4%20%EC%82%AC%EB%9E%8C%EA%B3%BC%20%EC%97%AD%EC%82%AC%EB%A5%BC%20%EC%9E%87%EB%8A%94%20%EA%B8%B8&srcid=26558421&map_type=TYPE_MAP",
     },
     {
+    
         "id": "seoul_3",
         "name": "서울둘레길 19코스 북한산 성북",
         "name_en": "Seoul Dulegil Route 19 - Bukhansan Seongbuk",
