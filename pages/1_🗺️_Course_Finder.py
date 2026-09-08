@@ -89,16 +89,24 @@ REGION_DATA = {
     },
 }
 
+# session_state 초기화
 for key in ["selected_course", "route", "descriptions", "restaurants", "accommodations", "highlight_coords"]:
     if key not in st.session_state:
         st.session_state[key] = None if key != "descriptions" else {}
+if "current_region" not in st.session_state:
+    st.session_state.current_region = "🌿 Jeju"
 
 # ── 사이드바 ──
 with st.sidebar:
     st.markdown("## 🌿 Find Your Route")
     st.markdown("---")
 
-    region = st.selectbox("🗺️ Region", list(REGION_DATA.keys()))
+    region_keys = list(REGION_DATA.keys())
+    region = st.selectbox(
+        "🗺️ Region", region_keys,
+        index=region_keys.index(st.session_state.current_region)
+    )
+    st.session_state.current_region = region
     region_info = REGION_DATA[region]
     all_themes = region_info["themes"]
     highlight_coords = region_info["coords"]
@@ -144,6 +152,7 @@ with st.sidebar:
         if st.button("🏃 Start This Route", type="primary", use_container_width=True):
             st.session_state.selected_course = selected_course
             st.session_state.highlight_coords = highlight_coords
+            st.session_state.current_region = region
             st.session_state.route = None
             st.session_state.descriptions = {}
             st.session_state.restaurants = None
@@ -196,8 +205,7 @@ if st.session_state.selected_course:
 
     st.markdown("---")
 
-    # TourAPI 먼저 로드
-        # TourAPI 먼저 로드
+    # TourAPI 로드
     if st.session_state.restaurants is None:
         try:
             st.session_state.restaurants = get_nearby_restaurants(course["lat"], course["lon"])
@@ -222,7 +230,6 @@ if st.session_state.selected_course:
 
     m = folium.Map(location=[center_lat, center_lon], zoom_start=13, tiles="OpenStreetMap")
 
-    # 시작점
     folium.CircleMarker(
         location=[course['lat'], course['lon']],
         radius=14, color="white", fill=True,
@@ -231,7 +238,6 @@ if st.session_state.selected_course:
         tooltip=f"🚩 Start: {course['start_en']}"
     ).add_to(m)
 
-    # 하이라이트 핀
     colors = ["blue", "purple", "orange", "red", "darkblue"]
     highlight_coords_list = []
     for i, highlight in enumerate(course['highlights_en']):
@@ -245,8 +251,6 @@ if st.session_state.selected_course:
                 icon=folium.Icon(color=colors[i % len(colors)], icon="star", prefix="fa")
             ).add_to(m)
 
-
-    # 음식점 핀
     if st.session_state.restaurants:
         for r in st.session_state.restaurants[:4]:
             p = format_place(r)
@@ -261,7 +265,6 @@ if st.session_state.selected_course:
                 except:
                     pass
 
-    # 숙박 핀
     if st.session_state.accommodations:
         for a in st.session_state.accommodations[:4]:
             p = format_place(a)
@@ -276,41 +279,38 @@ if st.session_state.selected_course:
                 except:
                     pass
 
-    # 범례
     legend_html = """
     <div style='position:fixed;bottom:30px;left:50px;z-index:1000;
                 background:white;padding:10px 14px;border-radius:8px;
                 border:1px solid #ccc;font-size:12px;line-height:2;
                 box-shadow:2px 2px 6px rgba(0,0,0,0.15)'>
-        🟢 Start Point<br>⭐ Highlights<br>→ Route Direction<br>🔴 Restaurants<br>🔵 Accommodations
+        🟢 Start Point<br>⭐ Highlights<br>🔴 Restaurants<br>🔵 Accommodations
     </div>
     """
     m.get_root().html.add_child(folium.Element(legend_html))
     st_folium(m, width=None, height=450, returned_objects=[])
 
-
-       # 공식 지도 버튼
+    # 공식 지도 버튼
     st.markdown("#### 🗺️ View Official Route Map")
     st.caption("Our map shows key highlights. For the exact trail route, use the official maps below.")
     map_col1, map_col2 = st.columns(2)
     with map_col1:
         if course.get("official_map_url"):
-            # 지역별 버튼 텍스트/색상 구분
             if "seoul.go.kr" in course["official_map_url"]:
                 btn_label = "🗺️ Smart Seoul Map (Official)"
                 btn_color = "#2D6A4F"
-                btn_text_color = "white"
             elif "busan.go.kr" in course["official_map_url"]:
                 btn_label = "🗺️ Galmaetgil Official Site"
                 btn_color = "#0066CC"
-                btn_text_color = "white"
+            elif "jejuolle.org" in course["official_map_url"]:
+                btn_label = "🌿 Jeju Olle Official Map"
+                btn_color = "#40916C"
             else:
                 btn_label = "🗺️ Official Map"
                 btn_color = "#2D6A4F"
-                btn_text_color = "white"
             st.markdown(f"""
             <a href='{course["official_map_url"]}' target='_blank'>
-                <button style='width:100%;background:{btn_color};color:{btn_text_color};border:none;
+                <button style='width:100%;background:{btn_color};color:white;border:none;
                               padding:12px;border-radius:8px;cursor:pointer;font-size:1rem;
                               font-weight:600;margin-top:4px'>
                     {btn_label}
@@ -328,7 +328,6 @@ if st.session_state.selected_course:
                 </button>
             </a>
             """, unsafe_allow_html=True)
-
 
     st.markdown("---")
 
@@ -367,7 +366,6 @@ if st.session_state.selected_course:
             unsafe_allow_html=True
         )
 
-    # After Your Plogging
     st.markdown("---")
     st.markdown("### 🍽️ After Your Plogging")
     st.caption("Nearby spots powered by 한국관광공사 OpenAPI")
@@ -448,6 +446,7 @@ else:
                         if st.button("View Route →", key=f"btn_{course['id']}"):
                             st.session_state.selected_course = course
                             st.session_state.highlight_coords = region_info["coords"]
+                            st.session_state.current_region = region_name
                             st.session_state.route = None
                             st.session_state.descriptions = {}
                             st.session_state.restaurants = None
