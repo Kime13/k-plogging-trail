@@ -239,11 +239,9 @@ if st.session_state.selected_course:
     ).add_to(m)
 
     colors = ["blue", "purple", "orange", "red", "darkblue"]
-    highlight_coords_list = []
     for i, highlight in enumerate(course['highlights_en']):
         if highlight in highlight_coords:
             coords = highlight_coords[highlight]
-            highlight_coords_list.append(coords)
             folium.Marker(
                 location=coords,
                 popup=folium.Popup(f"⭐ {highlight}", max_width=200),
@@ -416,40 +414,46 @@ else:
     st.markdown("Select a region and course to get started!")
     st.markdown("---")
 
-    tab1, tab2, tab3 = st.tabs(["🌿 Jeju", "🏙️ Seoul", "🌊 Busan"])
+    region_choice = st.radio(
+        "Select Region",
+        list(REGION_DATA.keys()),
+        index=list(REGION_DATA.keys()).index(st.session_state.current_region),
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+    st.session_state.current_region = region_choice
+    region_info = REGION_DATA[region_choice]
 
-    for tab, (region_name, region_info) in zip([tab1, tab2, tab3], REGION_DATA.items()):
-        with tab:
-            for theme, theme_label in region_info["themes"].items():
-                theme_courses = [c for c in region_info["courses"] if c["theme"] == theme]
-                if not theme_courses:
-                    continue
-                st.markdown(f"### {theme_label}")
-                cols = st.columns(min(len(theme_courses), 3))
-                for i, course in enumerate(theme_courses):
-                    with cols[i % 3]:
-                        diff_color = {"Easy": "#2D6A4F", "Moderate": "#856404", "Challenge": "#842029"}[course['difficulty']]
-                        pet_icon = "🐾" if course['pet_friendly'] else ""
-                        st.markdown(
-                            f"<div style='background:white;border-radius:12px;padding:16px;"
-                            f"border:1px solid #D4C9B8;margin-bottom:8px;"
-                            f"box-shadow:0 2px 8px rgba(0,0,0,0.06);min-height:140px'>"
-                            f"<div style='font-weight:700;color:#2D6A4F;margin-bottom:6px'>{course['name_en']}</div>"
-                            f"<div style='font-size:0.82rem;color:#666;margin-bottom:10px'>{course['description_en'][:80]}...</div>"
-                            f"<div style='font-size:0.8rem;'>📏 {course['distance_km']}km &nbsp;"
-                            f"⏱️ {course['duration_hours']}h &nbsp;"
-                            f"<span style='color:{diff_color};font-weight:600'>{course['difficulty']}</span>"
-                            f"&nbsp;{pet_icon}</div>"
-                            f"</div>",
-                            unsafe_allow_html=True
-                        )
-                        if st.button("View Route →", key=f"btn_{course['id']}"):
-                            st.session_state.selected_course = course
-                            st.session_state.highlight_coords = region_info["coords"]
-                            st.session_state.current_region = region_name
-                            st.session_state.route = None
-                            st.session_state.descriptions = {}
-                            st.session_state.restaurants = None
-                            st.session_state.accommodations = None
-                            st.rerun()
-                st.markdown("")
+    for theme, theme_label in region_info["themes"].items():
+        theme_courses = [c for c in region_info["courses"] if c["theme"] == theme]
+        if not theme_courses:
+            continue
+        st.markdown(f"### {theme_label}")
+        cols = st.columns(min(len(theme_courses), 3))
+        for i, course in enumerate(theme_courses):
+            with cols[i % 3]:
+                diff_color = {"Easy": "#2D6A4F", "Moderate": "#856404", "Challenge": "#842029"}[course['difficulty']]
+                pet_icon = "🐾" if course['pet_friendly'] else ""
+                st.markdown(
+                    f"<div style='background:white;border-radius:12px;padding:16px;"
+                    f"border:1px solid #D4C9B8;margin-bottom:8px;"
+                    f"box-shadow:0 2px 8px rgba(0,0,0,0.06);min-height:140px'>"
+                    f"<div style='font-weight:700;color:#2D6A4F;margin-bottom:6px'>{course['name_en']}</div>"
+                    f"<div style='font-size:0.82rem;color:#666;margin-bottom:10px'>{course['description_en'][:80]}...</div>"
+                    f"<div style='font-size:0.8rem;'>📏 {course['distance_km']}km &nbsp;"
+                    f"⏱️ {course['duration_hours']}h &nbsp;"
+                    f"<span style='color:{diff_color};font-weight:600'>{course['difficulty']}</span>"
+                    f"&nbsp;{pet_icon}</div>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+                if st.button("View Route →", key=f"btn_{course['id']}"):
+                    st.session_state.selected_course = course
+                    st.session_state.highlight_coords = region_info["coords"]
+                    st.session_state.current_region = region_choice
+                    st.session_state.route = None
+                    st.session_state.descriptions = {}
+                    st.session_state.restaurants = None
+                    st.session_state.accommodations = None
+                    st.rerun()
+        st.markdown("")
