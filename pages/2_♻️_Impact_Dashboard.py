@@ -1,6 +1,10 @@
 import streamlit as st
 import pandas as pd
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
+import logging
+
+logger = logging.getLogger(__name__)
 from supabase import create_client
 import os
 from dotenv import load_dotenv
@@ -24,6 +28,9 @@ def _get_supabase():
         _supabase = create_client(url, key)
     return _supabase
 
+# === CSS Theme Constants ===
+CHART_COLOR = "#2D6A4F"
+
 st.set_page_config(page_title="Impact Dashboard", page_icon="♻️", layout="wide")
 
 st.title("♻️ Plogging Impact Dashboard")
@@ -34,7 +41,7 @@ st.markdown("### 📝 Log Your Session")
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    log_date = st.date_input("Date", value=date.today())
+    log_date = st.date_input("Date", value=datetime.now(tz=ZoneInfo('Asia/Seoul')).date())
 with col2:
     all_courses = (
         [c["name_en"] for c in JEJU_OLLE_COURSES] +
@@ -69,6 +76,7 @@ if st.button("➕ Log This Session", type="primary"):
             st.success(f"✅ Logged! You collected {waste_kg}kg on {course_name}!")
             st.balloons()
         except Exception as e:
+            logger.error(f"Failed to save plogging log for {course_name}: {e}")
             st.error(f"Failed to save: {e}")
 
 st.markdown("---")
@@ -78,9 +86,10 @@ try:
     sb = _get_supabase()
     if sb is None:
         raise RuntimeError("Supabase not configured")
-    response = sb.table("plogging_logs").select("*").execute()
+    response = sb.table("plogging_logs").select("*").order("created_at", desc=True).limit(200).execute()
     all_data = response.data
-except Exception:
+except Exception as e:
+    logger.warning(f"Failed to load plogging logs from Supabase: {e}")
     all_data = []
 
 DEMO_DATA = [
@@ -128,7 +137,7 @@ with col2:
         x="Waste (kg)",
         y="Course",
         orientation="h",
-        color_discrete_sequence=["#2D6A4F"]
+        color_discrete_sequence=[CHART_COLOR]
     )
     fig.update_layout(
         margin=dict(l=0, r=0, t=0, b=0),
