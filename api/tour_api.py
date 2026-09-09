@@ -28,7 +28,7 @@ def get_nearby_attractions(lat, lon, radius=3000, content_type=12):
         data = response.json()
         items = data["response"]["body"]["items"]["item"]
         return items if isinstance(items, list) else [items]
-    except:
+    except Exception:
         return []
 
 def get_nearby_restaurants(lat, lon, radius=3000):

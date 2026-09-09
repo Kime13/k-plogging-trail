@@ -4,7 +4,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+_client = None
+
+def _get_client():
+    """Gemini 클라이언트 lazy 초기화 — API 키 미설정 시 import 크래시 방지"""
+    global _client
+    if _client is None:
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise RuntimeError("GEMINI_API_KEY environment variable is not set")
+        _client = genai.Client(api_key=api_key)
+    return _client
 
 def curate_in_english(place_data: dict) -> str:
     """관광지 국문 데이터를 영어로 큐레이션"""
@@ -16,7 +26,7 @@ Address: {place_data.get('addr1', '')}
 
 Write in a friendly, engaging tone. Focus on what makes this place special for outdoor activities."""
 
-    response = client.models.generate_content(
+    response = _get_client().models.generate_content(
         model="gemini-3.6-flash",
         contents=prompt
     )

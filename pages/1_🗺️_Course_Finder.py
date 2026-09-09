@@ -209,12 +209,12 @@ if st.session_state.selected_course:
     if st.session_state.restaurants is None:
         try:
             st.session_state.restaurants = get_nearby_restaurants(course["lat"], course["lon"])
-        except:
+        except Exception:
             st.session_state.restaurants = []
     if st.session_state.accommodations is None:
         try:
             st.session_state.accommodations = get_nearby_accommodations(course["lat"], course["lon"])
-        except:
+        except Exception:
             st.session_state.accommodations = []
 
     # 지도
@@ -260,7 +260,7 @@ if st.session_state.selected_course:
                         tooltip=f"🍜 {p['title']}",
                         icon=folium.Icon(color="red", icon="cutlery", prefix="fa")
                     ).add_to(m)
-                except:
+                except Exception:
                     pass
 
     if st.session_state.accommodations:
@@ -274,7 +274,7 @@ if st.session_state.selected_course:
                         tooltip=f"🏨 {p['title']}",
                         icon=folium.Icon(color="cadetblue", icon="bed", prefix="fa")
                     ).add_to(m)
-                except:
+                except Exception:
                     pass
 
     legend_html = """

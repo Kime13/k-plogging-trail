@@ -11,9 +11,18 @@ import plotly.express as px
 
 load_dotenv()
 
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
-supabase = create_client(url, key)
+_supabase = None
+
+def _get_supabase():
+    """Supabase 클라이언트 lazy 초기화 — 환경변수 미설정 시 import 크래시 방지"""
+    global _supabase
+    if _supabase is None:
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_KEY")
+        if not url or not key:
+            return None
+        _supabase = create_client(url, key)
+    return _supabase
 
 st.set_page_config(page_title="Impact Dashboard", page_icon="♻️", layout="wide")
 
@@ -45,26 +54,33 @@ waste_type = st.multiselect(
 )
 
 if st.button("➕ Log This Session", type="primary"):
-    try:
-        supabase.table("plogging_logs").insert({
-            "date": str(log_date),
-            "course": course_name,
-            "waste_kg": waste_kg,
-            "distance_km": distance_km,
-            "waste_types": ", ".join(waste_type)
-        }).execute()
-        st.success(f"✅ Logged! You collected {waste_kg}kg on {course_name}!")
-        st.balloons()
-    except Exception as e:
-        st.error(f"Failed to save: {e}")
+    sb = _get_supabase()
+    if sb is None:
+        st.error("⚠️ Supabase is not configured. Please set SUPABASE_URL and SUPABASE_KEY.")
+    else:
+        try:
+            sb.table("plogging_logs").insert({
+                "date": str(log_date),
+                "course": course_name,
+                "waste_kg": waste_kg,
+                "distance_km": distance_km,
+                "waste_types": ", ".join(waste_type)
+            }).execute()
+            st.success(f"✅ Logged! You collected {waste_kg}kg on {course_name}!")
+            st.balloons()
+        except Exception as e:
+            st.error(f"Failed to save: {e}")
 
 st.markdown("---")
 
 # ── 데이터 로드 ──
 try:
-    response = supabase.table("plogging_logs").select("*").execute()
+    sb = _get_supabase()
+    if sb is None:
+        raise RuntimeError("Supabase not configured")
+    response = sb.table("plogging_logs").select("*").execute()
     all_data = response.data
-except:
+except Exception:
     all_data = []
 
 DEMO_DATA = [
