@@ -6,6 +6,7 @@
 
 아래 스킬 파일을 반드시 읽고 해당 작업 시 지침을 따르라:
 
+- @.agents/skills/superpowers/SKILL.md — **모든 작업 시작 전** 관련 스킬 강제 호출
 - @.agents/skills/course-data-expert/SKILL.md — 코스 데이터 추가·수정 시
 - @.agents/skills/streamlit-ui-expert/SKILL.md — UI 컴포넌트·스타일 작업 시
 
