@@ -110,8 +110,9 @@ k-plogging-trail/
 ### 지역 추가 방법
 
 1. `utils/` 아래에 `{region}_courses.py` 생성
-2. `COURSES`, `HIGHLIGHT_COORDS`, `THEMES` 3개 변수 export
+2. `{REGION}_COURSES`, `{REGION}_HIGHLIGHT_COORDS`, `{REGION}_THEMES` 3개 변수 export
 3. `pages/1_🗺️_Course_Finder.py`의 `REGION_DATA`에 추가
+4. `pages/2_♻️_Impact_Dashboard.py`의 `all_courses` 리스트에 import 추가
 
 ## 환경변수
 
@@ -144,8 +145,13 @@ k-plogging-trail/
 # 의존성 설치
 pip install -r requirements.txt
 
-# 환경변수 설정
-cp .env.example .env  # 환경변수 편집
+# 환경변수 설정 (.env 파일 생성)
+cat > .env << 'EOF'
+GEMINI_API_KEY=your_key_here
+TOUR_API_KEY=your_key_here
+SUPABASE_URL=your_url_here
+SUPABASE_KEY=your_key_here
+EOF
 
 # 실행
 streamlit run app.py
