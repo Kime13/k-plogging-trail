@@ -1,6 +1,8 @@
-# AGENTS.md — K-Plogging Trail
+# AGENTS.md — K-Plogging Trail (SSOT)
 
-> AI 에이전트가 이 프로젝트를 이해하고 작업하기 위한 핵심 컨텍스트 문서
+> **이 파일이 프로젝트의 Single Source of Truth (SSOT)이다.**
+> 모든 AI 에이전트(Claude Code, Antigravity, Gemini 등)는 이 문서를 기준으로 동작한다.
+> 플랫폼별 설정 파일(CLAUDE.md, .gemini/ 등)은 이 문서를 참조하는 얇은 래퍼일 뿐이다.
 
 ## 프로젝트 개요
 
@@ -21,9 +23,25 @@
 
 ```
 k-plogging-trail/
+├── AGENTS.md                   # ★ SSOT — AI 에이전트 공유 컨텍스트
+├── CLAUDE.md                   # Claude Code 래퍼 (→ AGENTS.md 참조)
+├── README.md                   # 프로젝트 소개 문서
 ├── app.py                      # 랜딩 페이지 + 메인 허브
 ├── requirements.txt            # 의존성
 ├── .streamlit/config.toml      # Streamlit 테마
+├── .agents/skills/             # AI 에이전트 스킬 (12개)
+│   ├── superpowers/            # 메타: 스킬 강제 호출
+│   ├── brainstorming/          # 프로세스: 기능 구조화
+│   ├── systematic-debugging/   # 프로세스: 근본 원인 추적
+│   ├── writing-plans/          # 프로세스: 구현 계획
+│   ├── explain-before-act/     # 프로세스: 작업 전 설명
+│   ├── course-data-expert/     # 구현: 코스 데이터 스키마
+│   ├── streamlit-ui-expert/    # 구현: UI 스타일 가이드
+│   ├── mobile-responsive-expert/ # 구현: 모바일 반응형
+│   ├── verification-before-completion/ # 품질: 완료 검증
+│   ├── ralph-loop/             # 품질: 끝까지 해결
+│   ├── test-driven-development/ # 품질: TDD
+│   └── provide-test-for-human/ # 품질: 수동 검증 가이드
 ├── api/
 │   ├── claude_api.py           # Gemini AI 큐레이션 (파일명 레거시)
 │   └── tour_api.py             # 한국관광공사 OpenAPI
@@ -32,10 +50,31 @@ k-plogging-trail/
 │   └── 2_♻️_Impact_Dashboard.py # 플로깅 기록·통계
 └── utils/
     ├── busan_courses.py        # 부산 갈맷길 코스 데이터
-    ├── helpers.py              # OSRM 도보 경로
+    ├── helpers.py              # OSRM 도보 경로 (미사용)
     ├── jeju_olle.py            # 제주 올레 코스 데이터
-    ├── kakao_coords.py         # 카카오 좌표 조회 (개발 스크립트)
+    ├── kakao_coords.py         # 카카오 좌표 조회 (미사용, 개발 스크립트)
     └── seoul_courses.py        # 서울 둘레길 코스 데이터
+```
+
+## 스킬 체계
+
+12개 스킬이 `.agents/skills/`에 있으며, 아래 순서로 호출한다:
+
+```
+메타        superpowers ─── 모든 작업 전 스킬 강제 호출
+             ↓
+프로세스    brainstorming → writing-plans (기능 추가)
+            systematic-debugging (버그 수정)
+            explain-before-act (모든 작업)
+             ↓
+구현        course-data-expert (코스 데이터)
+            streamlit-ui-expert (UI)
+            mobile-responsive-expert (모바일)
+             ↓
+품질        test-driven-development (TDD)
+            verification-before-completion (완료 검증)
+            ralph-loop (끝까지 해결)
+            provide-test-for-human (수동 검증)
 ```
 
 ## 핵심 데이터 구조

@@ -1,10 +1,12 @@
 # CLAUDE.md — K-Plogging Trail
 
+> 이 파일은 Claude Code 전용 래퍼이다.
+> **프로젝트의 SSOT(Single Source of Truth)는 AGENTS.md**이며, 이 파일은 AGENTS.md를 참조하고
+> Claude Code 고유 기능(`@` 참조)으로 스킬을 연결하는 역할만 한다.
+
 @AGENTS.md
 
-## 프로젝트 스킬
-
-아래 스킬 파일을 반드시 읽고 해당 작업 시 지침을 따르라:
+## 스킬 참조
 
 ### 메타
 
@@ -29,12 +31,3 @@
 - @.agents/skills/ralph-loop/SKILL.md — 실패 시 끝까지 해결
 - @.agents/skills/test-driven-development/SKILL.md — 기능/버그 수정 전 테스트 먼저
 - @.agents/skills/provide-test-for-human/SKILL.md — 사용자 수동 검증 가이드
-
-## Claude 전용 지침
-
-- 이 프로젝트의 모든 컨텍스트는 AGENTS.md를 참조하라
-- 코드 수정 시 기존 Streamlit CSS 스타일 컨벤션을 유지하라
-- 커밋 메시지는 영문으로 작성하라 (예: `Fix highlight coordinates for Busan routes`)
-- `api/claude_api.py` 파일명은 레거시이며 내부적으로 Gemini API를 사용한다
-- 환경변수는 `.env` 파일에 저장되며 `python-dotenv`로 로드한다
-
