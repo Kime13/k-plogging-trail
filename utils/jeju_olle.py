@@ -112,21 +112,6 @@ JEJU_OLLE_COURSES = [
     },
 ]
 
-def get_course_by_id(course_id):
-    for course in JEJU_OLLE_COURSES:
-        if str(course["id"]) == str(course_id):
-            return course
-    return None
-
-def get_courses_by_theme(theme):
-    return [c for c in JEJU_OLLE_COURSES if c["theme"] == theme]
-
-def get_courses_by_difficulty(difficulty):
-    return [c for c in JEJU_OLLE_COURSES if c["difficulty"] == difficulty]
-
-def get_pet_friendly_courses():
-    return [c for c in JEJU_OLLE_COURSES if c["pet_friendly"]]
-
 JEJU_THEMES = {
     "coastal": "🌊 Coastal",
     "island": "🏝️ Island",
