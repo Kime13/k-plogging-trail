@@ -6,9 +6,26 @@
 
 아래 스킬 파일을 반드시 읽고 해당 작업 시 지침을 따르라:
 
+### 메타
+
 - @.agents/skills/superpowers/SKILL.md — **모든 작업 시작 전** 관련 스킬 강제 호출
+
+### 프로세스 (먼저 호출)
+
+- @.agents/skills/brainstorming/SKILL.md — 기능 추가, 새 페이지, 새 지역 추가 전
+- @.agents/skills/systematic-debugging/SKILL.md — 버그, API 실패, 지도 오류 시
+- @.agents/skills/writing-plans/SKILL.md — 다단계 구현 계획 수립 시
+- @.agents/skills/explain-before-act/SKILL.md — 모든 작업 시작 전 상황 설명
+
+### 구현 (프로세스 후 호출)
+
 - @.agents/skills/course-data-expert/SKILL.md — 코스 데이터 추가·수정 시
 - @.agents/skills/streamlit-ui-expert/SKILL.md — UI 컴포넌트·스타일 작업 시
+
+### 품질 (완료 전 호출)
+
+- @.agents/skills/verification-before-completion/SKILL.md — 작업 완료 선언 전 검증
+- @.agents/skills/ralph-loop/SKILL.md — 실패 시 끝까지 해결
 
 ## Claude 전용 지침
 
