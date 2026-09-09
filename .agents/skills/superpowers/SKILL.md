@@ -42,6 +42,7 @@ Process skills come first, then implementation skills:
 |------|--------|
 | `course-data-expert` | 코스·좌표·하이라이트 데이터 작업 |
 | `streamlit-ui-expert` | CSS, 컴포넌트, 레이아웃 작업 |
+| `mobile-responsive-expert` | 모바일 반응형 CSS, 터치 UI |
 
 ### 품질 스킬 (Quality — 완료 전 호출)
 
@@ -49,6 +50,8 @@ Process skills come first, then implementation skills:
 |------|--------|
 | `verification-before-completion` | 작업 완료 선언 전 |
 | `ralph-loop` | 테스트/빌드 실패 시 끝까지 해결 |
+| `test-driven-development` | 기능/버그 수정 전 테스트 먼저 |
+| `provide-test-for-human` | 사용자 수동 검증 가이드 |
 
 ## Red Flags
 
