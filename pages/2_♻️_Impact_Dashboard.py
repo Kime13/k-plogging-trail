@@ -46,15 +46,30 @@ waste_type = st.multiselect(
 
 if st.button("➕ Log This Session", type="primary"):
     try:
+        # Green Point 계산
+        green_points = int(
+            distance_km * 10
+            + waste_kg * 100
+        )
+
         supabase.table("plogging_logs").insert({
             "date": str(log_date),
             "course": course_name,
             "waste_kg": waste_kg,
             "distance_km": distance_km,
-            "waste_types": ", ".join(waste_type)
+            "waste_types": ", ".join(waste_type),
         }).execute()
-        st.success(f"✅ Logged! You collected {waste_kg}kg on {course_name}!")
+
+        st.success(
+            f"✅ Logged! You collected {waste_kg}kg on {course_name}!"
+        )
+
+        st.success(
+            f"🌱 You earned {green_points} Green Points!"
+        )
+
         st.balloons()
+
     except Exception as e:
         st.error(f"Failed to save: {e}")
 
