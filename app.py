@@ -1,22 +1,36 @@
 import streamlit as st
 import time
 
+# === CSS Theme Constants ===
+APP_BG_GRADIENT_START = "#e8f5e9"
+APP_BG_GRADIENT_MID = "#c8e6c9"
+APP_BG_GRADIENT_END = "#b2dfdb"
+ICON_GRADIENT_START = "#43a047"
+ICON_GRADIENT_END = "#2e7d32"
+TITLE_COLOR = "#1b5e20"
+SUBTITLE_COLOR = "#4caf50"
+BADGE_GRADIENT_START = "#e8f5e9"
+BADGE_GRADIENT_END = "#c8e6c9"
+BADGE_TEXT = "#2e7d32"
+DOT_ACTIVE = "#43a047"
+APP_MAIN_BG = "#F7F3EE"
+
 st.set_page_config(page_title="K-Plogging Trail", page_icon="🌿", layout="wide")
 
 if "entered" not in st.session_state:
     st.session_state.entered = False
 
 if not st.session_state.entered:
-    st.markdown("""
+    st.markdown(f"""
     <style>
-    .stApp {
-        background: linear-gradient(160deg, #e8f5e9 0%, #c8e6c9 40%, #b2dfdb 100%);
-    }
-    [data-testid="stSidebar"] { display: none; }
-    header { display: none; }
-    .block-container { padding: 0 !important; max-width: 100% !important; }
+    .stApp {{
+        background: linear-gradient(160deg, {APP_BG_GRADIENT_START} 0%, {APP_BG_GRADIENT_MID} 40%, {APP_BG_GRADIENT_END} 100%);
+    }}
+    [data-testid="stSidebar"] {{ display: none; }}
+    header {{ display: none; }}
+    .block-container {{ padding: 0 !important; max-width: 100% !important; }}
 
-    .landing {
+    .landing {{
         min-height: 100vh;
         display: flex;
         flex-direction: column;
@@ -24,9 +38,9 @@ if not st.session_state.entered:
         justify-content: center;
         gap: 24px;
         padding: 40px 20px;
-    }
+    }}
 
-    .hero-card {
+    .hero-card {{
         width: 460px;
         height: 460px;
         background: white;
@@ -41,38 +55,38 @@ if not st.session_state.entered:
         overflow: hidden;
         transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease, opacity 0.5s ease;
         cursor: pointer;
-    }
-    .hero-card:hover {
+    }}
+    .hero-card:hover {{
         transform: translateY(-8px);
         box-shadow: 0 32px 80px rgba(46,125,50,0.22), 0 8px 24px rgba(46,125,50,0.12);
-    }
-    .hero-card:active {
+    }}
+    .hero-card:active {{
         transform: scale(0.98);
-    }
-    .hero-card.fade-out {
+    }}
+    .hero-card.fade-out {{
         opacity: 0;
         transform: scale(1.04);
-    }
-    .hero-card::before {
+    }}
+    .hero-card::before {{
         content: '';
         position: absolute;
         top: -40px; right: -40px;
         width: 160px; height: 160px;
         background: radial-gradient(circle, rgba(165,214,167,0.4), transparent 70%);
         border-radius: 50%;
-    }
-    .hero-card::after {
+    }}
+    .hero-card::after {{
         content: '';
         position: absolute;
         bottom: -60px; left: -30px;
         width: 200px; height: 200px;
         background: radial-gradient(circle, rgba(77,182,172,0.2), transparent 70%);
         border-radius: 50%;
-    }
+    }}
 
-    .icon-wrap {
+    .icon-wrap {{
         width: 88px; height: 88px;
-        background: linear-gradient(135deg, #43a047, #2e7d32);
+        background: linear-gradient(135deg, {ICON_GRADIENT_START}, {ICON_GRADIENT_END});
         border-radius: 24px;
         display: flex; align-items: center; justify-content: center;
         font-size: 44px;
@@ -80,68 +94,70 @@ if not st.session_state.entered:
         margin-bottom: 22px;
         z-index: 1;
         transition: transform 0.3s ease;
-    }
-    .hero-card:hover .icon-wrap {
+    }}
+    .hero-card:hover .icon-wrap {{
         transform: rotate(-5deg) scale(1.08);
-    }
+    }}
 
-    .hero-title {
+    .hero-title {{
         font-size: 2rem;
         font-weight: 800;
-        color: #1b5e20;
+        color: {TITLE_COLOR};
         margin: 0 0 8px;
         text-align: center;
         letter-spacing: -0.5px;
         z-index: 1;
-    }
-    .hero-subtitle {
+    }}
+    .hero-subtitle {{
         font-size: 0.95rem;
-        color: #4caf50;
+        color: {SUBTITLE_COLOR};
         font-style: italic;
         margin: 0 0 22px;
         text-align: center;
         z-index: 1;
-    }
-    .hero-badge {
-        background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    }}
+    .hero-badge {{
+        background: linear-gradient(135deg, {BADGE_GRADIENT_START}, {BADGE_GRADIENT_END});
         border: 1.5px solid rgba(76,175,80,0.4);
         border-radius: 24px;
         padding: 9px 20px;
         font-size: 0.82rem;
-        color: #2e7d32;
+        color: {BADGE_TEXT};
         font-weight: 600;
         z-index: 1;
         letter-spacing: 0.3px;
-    }
-    .hero-hint {
+    }}
+    .hero-hint {{
         font-size: 0.78rem;
         color: rgba(46,125,50,0.5);
         margin: 18px 0 0;
         z-index: 1;
         letter-spacing: 0.5px;
-    }
+    }}
 
-    .dots {
+    .dots {{
         display: flex; gap: 8px; align-items: center;
-    }
-    .dot-active {
+    }}
+    .dot-active {{
         width: 28px; height: 8px;
         border-radius: 4px;
-        background: #43a047;
-    }
-    .dot {
+        background: {DOT_ACTIVE};
+    }}
+    .dot {{
         width: 8px; height: 8px;
         border-radius: 50%;
         background: rgba(46,125,50,0.25);
-    }
-    .powered {
+    }}
+    .powered {{
         font-size: 0.72rem;
         color: rgba(46,125,50,0.45);
         letter-spacing: 0.5px;
-    }
+    }}
 
     /* 투명 버튼으로 전체 클릭 감지 */
-    .stButton > button {
+    /* ⚠️ This CSS trick depends on Streamlit's internal DOM structure. */
+    /* May break on Streamlit version updates. Pin streamlit version if needed. */
+    .stButton > button {{
         position: fixed !important;
         top: 0 !important; left: 0 !important;
         width: 100vw !important; height: 100vh !important;
@@ -150,7 +166,7 @@ if not st.session_state.entered:
         z-index: 999 !important;
         border: none !important;
         background: transparent !important;
-    }
+    }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -184,9 +200,9 @@ if not st.session_state.entered:
         st.rerun()
 
 else:
-    st.markdown("""
+    st.markdown(f"""
     <style>
-    .stApp { background-color: #F7F3EE; }
+    .stApp {{ background-color: {APP_MAIN_BG}; }}
     </style>
     """, unsafe_allow_html=True)
 
