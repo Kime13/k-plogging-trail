@@ -2,6 +2,7 @@ import streamlit as st
 import folium
 import logging
 from utils.ui_components import *
+from utils.ui_components import TEXT_MUTED, TEXT_MUTED_ALT, CARD_BORDER, CARD_VALUE, DIFF_EASY, DIFF_MODERATE, DIFF_CHALLENGE, BTN_PRIMARY, BTN_SECONDARY, BTN_TERTIARY, KAKAO_BG, KAKAO_TEXT
 
 logger = logging.getLogger(__name__)
 from streamlit_folium import st_folium
