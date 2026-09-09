@@ -140,3 +140,23 @@ def render_nearby_spots(course, restaurants, accommodations):
                 """, unsafe_allow_html=True)
         else:
             st.info("No accommodations found nearby.")
+
+# UI Color Constants
+CARD_BORDER = "#D4C9B8"
+CARD_VALUE = "#2D6A4F"
+TEXT_MUTED_ALT = "#666666"
+
+# Button Colors
+BTN_PRIMARY = "#2D6A4F"
+BTN_SECONDARY = "#0066CC"
+BTN_TERTIARY = "#40916C"
+
+# Kakao Map Button
+KAKAO_BG = "#FEE500"
+KAKAO_TEXT = "#3C1E1E"
+
+# Difficulty Colors
+DIFF_EASY = "#2D6A4F"
+DIFF_MODERATE = "#856404"
+DIFF_CHALLENGE = "#842029"
+TEXT_MUTED = '#888888'

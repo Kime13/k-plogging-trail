@@ -39,7 +39,7 @@ if not st.session_state.entered:
         border: 1.5px solid rgba(129,199,132,0.35);
         position: relative;
         overflow: hidden;
-        transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease, opacity 0.5s ease;
+        transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease, opacity 0.6s ease;
         cursor: pointer;
         z-index: 1;
     }
@@ -47,12 +47,10 @@ if not st.session_state.entered:
         transform: translateY(-8px);
         box-shadow: 0 32px 80px rgba(46,125,50,0.22), 0 8px 24px rgba(46,125,50,0.12);
     }
-    .hero-card:active {
-        transform: scale(0.98);
-    }
     .hero-card.fade-out {
-        opacity: 0;
-        transform: scale(1.04);
+        opacity: 0 !important;
+        transform: scale(1.04) !important;
+        transition: opacity 0.6s ease, transform 0.6s ease !important;
     }
     .hero-card::before {
         content: '';
@@ -172,21 +170,26 @@ if not st.session_state.entered:
     </div>
 
     <script>
-    var btn = document.querySelector('.stButton > button');
-    if (btn) {
-        btn.addEventListener('click', function() {
-            var card = document.getElementById('heroCard');
-            if (card) {
+    window.addEventListener('load', function() {
+        var realBtn = document.querySelector('.stButton > button');
+        var card = document.getElementById('heroCard');
+        if (realBtn && card) {
+            realBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 card.classList.add('fade-out');
-            }
-        });
-    }
+                setTimeout(function() {
+                    realBtn.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+                }, 650);
+            }, true);
+        }
+    });
     </script>
     """, unsafe_allow_html=True)
 
     if st.button("enter", key="enter_btn"):
         st.session_state.entered = True
-        time.sleep(0.5)
+        time.sleep(0.6)
         st.rerun()
 
 else:
