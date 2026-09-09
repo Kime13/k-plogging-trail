@@ -1,6 +1,9 @@
 import requests
 import os
+import logging
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -24,11 +27,12 @@ def get_nearby_attractions(lat, lon, radius=3000, content_type=12):
         "_type": "json"
     }
     try:
-        response = requests.get(url, params=params, timeout=3)
+        response = requests.get(url, params=params, timeout=8)
         data = response.json()
         items = data["response"]["body"]["items"]["item"]
         return items if isinstance(items, list) else [items]
-    except Exception:
+    except Exception as e:
+        logger.error(f"Tour API request failed for coords ({lat}, {lon}) with contentType {content_type}: {e}")
         return []
 
 def get_nearby_restaurants(lat, lon, radius=3000):
