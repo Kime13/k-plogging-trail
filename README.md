@@ -46,22 +46,29 @@ pip install -r requirements.txt
 
 ### Environment Variables
 
-프로젝트 루트에 `.env` 파일을 생성하세요:
+`.env.example`을 복사한 뒤, 실제 API 키를 입력하세요:
 
-```env
-GEMINI_API_KEY=your_gemini_api_key
-TOUR_API_KEY=your_tour_api_key
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_KEY=your_supabase_anon_key
-KAKAO_API_KEY=your_kakao_api_key  # 선택
+```bash
+cp .env.example .env
 ```
 
-| 변수 | 발급처 |
-|------|--------|
-| `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/) |
-| `TOUR_API_KEY` | [공공데이터포털](https://www.data.go.kr/) |
-| `SUPABASE_URL` / `SUPABASE_KEY` | [Supabase](https://supabase.com/) |
-| `KAKAO_API_KEY` | [Kakao Developers](https://developers.kakao.com/) |
+`.env` 파일을 열어 `your_..._here` 부분을 실제 키로 교체합니다:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+TOUR_API_KEY=your_tour_api_key_here
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_KEY=your_supabase_anon_key_here
+# KAKAO_API_KEY=your_kakao_api_key_here  # 선택 (개발용)
+```
+
+| 변수 | 필수 | 발급처 | 용도 |
+|------|:---:|--------|------|
+| `GEMINI_API_KEY` | ✅ | [Google AI Studio](https://aistudio.google.com/apikey) | AI 코스 설명 + 루트 생성 |
+| `TOUR_API_KEY` | ✅ | [공공데이터포털](https://www.data.go.kr/) | 주변 관광지 추천 |
+| `SUPABASE_URL` | ✅ | [Supabase](https://supabase.com/) → Settings → API | 플로깅 기록 저장 |
+| `SUPABASE_KEY` | ✅ | [Supabase](https://supabase.com/) → Settings → API | 플로깅 기록 저장 |
+| `KAKAO_API_KEY` | 선택 | [Kakao Developers](https://developers.kakao.com/) | 좌표 조회 (개발용) |
 
 ### Run
 

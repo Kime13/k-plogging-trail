@@ -43,17 +43,19 @@ k-plogging-trail/
 │   ├── test-driven-development/ # 품질: TDD
 │   └── provide-test-for-human/ # 품질: 수동 검증 가이드
 ├── api/
-│   ├── claude_api.py           # Gemini AI 큐레이션 (파일명 레거시)
+│   ├── gemini_api.py           # Gemini AI 큐레이션
 │   └── tour_api.py             # 한국관광공사 OpenAPI
 ├── pages/
-│   ├── 1_🗺️_Course_Finder.py  # 코스 탐색·지도·AI 루트
+│   ├── 1_🗺️_Course_Finder.py  # 코스 탐색·지도·AI 루트 (오케스트레이터)
 │   └── 2_♻️_Impact_Dashboard.py # 플로깅 기록·통계
 └── utils/
     ├── busan_courses.py        # 부산 갈맷길 코스 데이터
     ├── helpers.py              # OSRM 도보 경로 (미사용)
     ├── jeju_olle.py            # 제주 올레 코스 데이터
     ├── kakao_coords.py         # 카카오 좌표 조회 (미사용, 개발 스크립트)
-    └── seoul_courses.py        # 서울 둘레길 코스 데이터
+    ├── map_builder.py          # Folium 지도 생성·마커 추가
+    ├── seoul_courses.py        # 서울 둘레길 코스 데이터
+    └── ui_components.py        # Course Finder UI 컴포넌트 (CSS·카드·명소)
 ```
 
 ## 스킬 체계
@@ -140,8 +142,8 @@ k-plogging-trail/
 
 ## 주의 사항
 
-- `api/claude_api.py`는 이름과 달리 **Gemini API**를 사용함 (레거시 네이밍)
 - `utils/helpers.py`, `utils/kakao_coords.py`는 현재 앱에서 import되지 않음 (개발 유틸)
+- `utils/ui_components.py`, `utils/map_builder.py`는 `pages/1_Course_Finder.py`에서 import하는 UI/지도 모듈
 - `pages/` 파일에 `set_page_config()`가 있으면 Streamlit 경고 발생 가능
 - Supabase 테이블명: `plogging_logs`
 
