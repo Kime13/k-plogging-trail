@@ -58,6 +58,7 @@ if st.button("➕ Log This Session", type="primary"):
             "waste_kg": waste_kg,
             "distance_km": distance_km,
             "waste_types": ", ".join(waste_type),
+            "green_points": green_points
         }).execute()
 
         st.success(
