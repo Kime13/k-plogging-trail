@@ -1,75 +1,22 @@
 import streamlit as st
 import folium
+import logging
+from utils.ui_components import *
+from utils.ui_components import TEXT_MUTED, TEXT_MUTED_ALT, CARD_BORDER, CARD_VALUE, DIFF_EASY, DIFF_MODERATE, DIFF_CHALLENGE, BTN_PRIMARY, BTN_SECONDARY, BTN_TERTIARY, KAKAO_BG, KAKAO_TEXT
+
+logger = logging.getLogger(__name__)
 from streamlit_folium import st_folium
 from utils.jeju_olle import JEJU_OLLE_COURSES, JEJU_THEMES, HIGHLIGHT_COORDS
 from utils.seoul_courses import SEOUL_COURSES, SEOUL_HIGHLIGHT_COORDS, SEOUL_THEMES
 from utils.busan_courses import BUSAN_COURSES, BUSAN_HIGHLIGHT_COORDS, BUSAN_THEMES
-from api.claude_api import curate_in_english, generate_plogging_route
-from api.tour_api import get_nearby_restaurants, get_nearby_accommodations, format_place
+from api.gemini_api import curate_in_english, generate_plogging_route
+from api.tour_api import get_nearby_restaurants, get_nearby_accommodations
+from utils.ui_components import inject_course_finder_css, render_course_detail, render_nearby_spots
+from utils.map_builder import build_course_map, add_poi_markers
 
 st.set_page_config(page_title="Course Finder", page_icon="🗺️", layout="wide")
 
-st.markdown("""
-<style>
-.stApp { background-color: #F7F3EE; }
-[data-testid="stSidebar"] { background-color: #EDE8E0; }
-.course-header {
-    background: linear-gradient(135deg, #2D6A4F, #40916C);
-    color: white;
-    padding: 24px 28px;
-    border-radius: 16px;
-    margin-bottom: 20px;
-}
-.course-header h2 { color: white; margin: 0 0 8px 0; font-size: 1.6rem; }
-.course-header p { color: #B7E4C7; margin: 0; font-size: 0.95rem; }
-.info-banner {
-    background: #D8F3DC;
-    border-left: 4px solid #2D6A4F;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    color: #1B4332;
-    font-size: 0.95rem;
-}
-.metric-card {
-    background: white;
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-    border: 1px solid #D4C9B8;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-.metric-card .value { font-size: 1.8rem; font-weight: 700; color: #2D6A4F; }
-.metric-card .label { font-size: 0.8rem; color: #888; margin-top: 4px; }
-.route-box {
-    background: white;
-    border-left: 4px solid #40916C;
-    border-radius: 10px;
-    padding: 20px;
-    font-size: 0.92rem;
-    line-height: 1.9;
-    color: #2d2d2d;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-.tip-box {
-    background: #F0FFF4;
-    border: 1px dashed #40916C;
-    border-radius: 10px;
-    padding: 14px 16px;
-    color: #1B4332;
-    font-size: 0.9rem;
-    margin-top: 12px;
-}
-.place-card {
-    background: white;
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 8px;
-    border: 1px solid #E0D9CE;
-}
-h3 { color: #2D6A4F; }
-</style>
-""", unsafe_allow_html=True)
+inject_course_finder_css()
 
 REGION_DATA = {
     "🌿 Jeju": {
@@ -137,9 +84,9 @@ with st.sidebar:
 
         st.markdown("---")
         st.markdown(f"""
-        <div style='background:white;border-radius:12px;padding:14px;border:1px solid #D4C9B8;'>
-            <div style='font-size:0.85rem;color:#888;margin-bottom:8px'>Selected Course</div>
-            <div style='font-weight:700;color:#2D6A4F;font-size:1rem;margin-bottom:10px'>{selected_course['name_en']}</div>
+        <div style='background:white;border-radius:12px;padding:14px;border:1px solid {CARD_BORDER};'>
+            <div style='font-size:0.85rem;color:{TEXT_MUTED};margin-bottom:8px'>Selected Course</div>
+            <div style='font-weight:700;color:{CARD_VALUE};font-size:1rem;margin-bottom:10px'>{selected_course['name_en']}</div>
             <div style='font-size:0.85rem;'>
                 ⏱️ {selected_course['duration_hours']}h &nbsp;
                 📏 {selected_course['distance_km']}km &nbsp;
@@ -174,34 +121,7 @@ if st.session_state.selected_course:
         st.session_state.accommodations = None
         st.rerun()
 
-    theme_emoji = {"coastal": "🌊", "island": "🏝️", "forest": "🌲", "rural": "🌾",
-                   "urban": "🏙️", "mountain": "⛰️", "nature": "🌿", "park": "🌳",
-                   "beach": "🏖️", "heritage": "🏛️"}
-
-    st.markdown(f"""
-    <div class='course-header'>
-        <h2>{theme_emoji.get(course['theme'], '🌿')} {course['name_en']}</h2>
-        <p>{course['description_en']}</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.markdown(f"<div class='metric-card'><div class='value'>{course['distance_km']}km</div><div class='label'>Distance</div></div>", unsafe_allow_html=True)
-    with col2:
-        st.markdown(f"<div class='metric-card'><div class='value'>{course['duration_hours']}h</div><div class='label'>Duration</div></div>", unsafe_allow_html=True)
-    with col3:
-        diff_color = {"Easy": "#2D6A4F", "Moderate": "#856404", "Challenge": "#842029"}[course['difficulty']]
-        st.markdown(f"<div class='metric-card'><div class='value' style='color:{diff_color};font-size:1.4rem'>{course['difficulty']}</div><div class='label'>Difficulty</div></div>", unsafe_allow_html=True)
-    with col4:
-        st.markdown(f"<div class='metric-card'><div class='value' style='font-size:1.1rem'>{'🐾 Yes' if course['pet_friendly'] else '❌ No'}</div><div class='label'>Pet-friendly</div></div>", unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown(f"""
-    <div class='info-banner'>
-        🚩 <b>Start:</b> {course['start_en']} &nbsp;→&nbsp; 🏁 <b>End:</b> {course['end_en']}
-    </div>
-    """, unsafe_allow_html=True)
+    render_course_detail(course)
 
     st.markdown("---")
 
@@ -209,83 +129,20 @@ if st.session_state.selected_course:
     if st.session_state.restaurants is None:
         try:
             st.session_state.restaurants = get_nearby_restaurants(course["lat"], course["lon"])
-        except:
+        except Exception as e:
+            logger.warning(f"Failed to fetch restaurants for course {course['id']}: {e}")
             st.session_state.restaurants = []
     if st.session_state.accommodations is None:
         try:
             st.session_state.accommodations = get_nearby_accommodations(course["lat"], course["lon"])
-        except:
+        except Exception as e:
+            logger.warning(f"Failed to fetch accommodations for course {course['id']}: {e}")
             st.session_state.accommodations = []
 
     # 지도
     st.markdown("### 🗺️ Route Map")
-    all_lats = [course['lat']]
-    all_lons = [course['lon']]
-    for h in course['highlights_en']:
-        if h in highlight_coords:
-            all_lats.append(highlight_coords[h][0])
-            all_lons.append(highlight_coords[h][1])
-    center_lat = sum(all_lats) / len(all_lats)
-    center_lon = sum(all_lons) / len(all_lons)
-
-    m = folium.Map(location=[center_lat, center_lon], zoom_start=13, tiles="OpenStreetMap")
-
-    folium.CircleMarker(
-        location=[course['lat'], course['lon']],
-        radius=14, color="white", fill=True,
-        fill_color="#2D6A4F", fill_opacity=1.0,
-        popup=folium.Popup(f"<b>🚩 Start: {course['start_en']}</b>", max_width=200),
-        tooltip=f"🚩 Start: {course['start_en']}"
-    ).add_to(m)
-
-    colors = ["blue", "purple", "orange", "red", "darkblue"]
-    for i, highlight in enumerate(course['highlights_en']):
-        if highlight in highlight_coords:
-            coords = highlight_coords[highlight]
-            folium.Marker(
-                location=coords,
-                popup=folium.Popup(f"⭐ {highlight}", max_width=200),
-                tooltip=f"{i+1}. {highlight}",
-                icon=folium.Icon(color=colors[i % len(colors)], icon="star", prefix="fa")
-            ).add_to(m)
-
-    if st.session_state.restaurants:
-        for r in st.session_state.restaurants[:4]:
-            p = format_place(r)
-            if p['lat'] and p['lon']:
-                try:
-                    folium.Marker(
-                        location=[float(p['lat']), float(p['lon'])],
-                        popup=folium.Popup(f"🍜 {p['title']}<br>{p['addr']}", max_width=200),
-                        tooltip=f"🍜 {p['title']}",
-                        icon=folium.Icon(color="red", icon="cutlery", prefix="fa")
-                    ).add_to(m)
-                except:
-                    pass
-
-    if st.session_state.accommodations:
-        for a in st.session_state.accommodations[:4]:
-            p = format_place(a)
-            if p['lat'] and p['lon']:
-                try:
-                    folium.Marker(
-                        location=[float(p['lat']), float(p['lon'])],
-                        popup=folium.Popup(f"🏨 {p['title']}<br>{p['addr']}", max_width=200),
-                        tooltip=f"🏨 {p['title']}",
-                        icon=folium.Icon(color="cadetblue", icon="bed", prefix="fa")
-                    ).add_to(m)
-                except:
-                    pass
-
-    legend_html = """
-    <div style='position:fixed;bottom:30px;left:50px;z-index:1000;
-                background:white;padding:10px 14px;border-radius:8px;
-                border:1px solid #ccc;font-size:12px;line-height:2;
-                box-shadow:2px 2px 6px rgba(0,0,0,0.15)'>
-        🟢 Start Point<br>⭐ Highlights<br>🔴 Restaurants<br>🔵 Accommodations
-    </div>
-    """
-    m.get_root().html.add_child(folium.Element(legend_html))
+    m = build_course_map(course, highlight_coords)
+    m = add_poi_markers(m, st.session_state.restaurants, st.session_state.accommodations)
     st_folium(m, width=None, height=450, returned_objects=[])
 
     # 공식 지도 버튼
@@ -296,16 +153,16 @@ if st.session_state.selected_course:
         if course.get("official_map_url"):
             if "seoul.go.kr" in course["official_map_url"]:
                 btn_label = "🗺️ Smart Seoul Map (Official)"
-                btn_color = "#2D6A4F"
+                btn_color = BTN_PRIMARY
             elif "busan.go.kr" in course["official_map_url"]:
                 btn_label = "🗺️ Galmaetgil Official Site"
-                btn_color = "#0066CC"
+                btn_color = BTN_SECONDARY
             elif "jejuolle.org" in course["official_map_url"]:
                 btn_label = "🌿 Jeju Olle Official Map"
-                btn_color = "#40916C"
+                btn_color = BTN_TERTIARY
             else:
                 btn_label = "🗺️ Official Map"
-                btn_color = "#2D6A4F"
+                btn_color = BTN_PRIMARY
             st.markdown(f"""
             <a href='{course["official_map_url"]}' target='_blank'>
                 <button style='width:100%;background:{btn_color};color:white;border:none;
@@ -319,7 +176,7 @@ if st.session_state.selected_course:
         if course.get("kakao_map_url"):
             st.markdown(f"""
             <a href='{course["kakao_map_url"]}' target='_blank'>
-                <button style='width:100%;background:#FEE500;color:#3C1E1E;border:none;
+                <button style='width:100%;background:{KAKAO_BG};color:{KAKAO_TEXT};border:none;
                               padding:12px;border-radius:8px;cursor:pointer;font-size:1rem;
                               font-weight:600;margin-top:4px'>
                     🗺️ KakaoMap
@@ -341,9 +198,9 @@ if st.session_state.selected_course:
                         try:
                             desc = curate_in_english({"title": h, "addr1": course['start_en']})
                             st.session_state.descriptions[key] = desc
-                        except Exception:
-                            st.session_state.descriptions[key] = "⏳ Description unavailable. Please try again later."
-                st.write(st.session_state.descriptions[key])
+                        except Exception as e:
+                            logger.error(f"Failed to generate description for highlight {h} in course {course['id']}: {e}")
+                st.write(st.session_state.descriptions.get(key, "⏳ Description unavailable. Please try again later."))
 
         st.markdown(f"""
         <div class='tip-box'>♻️ <b>Plogging Tip:</b> {course['plogging_tip']}</div>
@@ -356,57 +213,17 @@ if st.session_state.selected_course:
                 try:
                     places = [{"title": h, "addr1": course["start_en"]} for h in course["highlights_en"]]
                     st.session_state.route = generate_plogging_route(places, course["difficulty"])
-                except Exception:
-                    st.session_state.route = "⏳ Route generation unavailable. Please try again later."
+                except Exception as e:
+                    logger.error(f"Failed to generate plogging route for course {course['id']}: {e}")
 
+        route_text = st.session_state.route or "⏳ Route generation unavailable. Please try again later."
         st.markdown(
-            f'<div class="route-box">{st.session_state.route.replace(chr(10), "<br>")}</div>',
+            f'<div class="route-box">{route_text.replace(chr(10), "<br>")}</div>',
             unsafe_allow_html=True
         )
 
     st.markdown("---")
-    st.markdown("### 🍽️ After Your Plogging")
-    st.caption("Nearby spots powered by 한국관광공사 OpenAPI")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.markdown("#### 🍜 Nearby Restaurants")
-        if st.session_state.restaurants:
-            for r in st.session_state.restaurants[:4]:
-                p = format_place(r)
-                kakao_url = f"https://map.kakao.com/link/search/{p['title']}"
-                st.markdown(f"""
-                <div class='place-card'>
-                    <div style='font-weight:600;color:#2D6A4F;'>
-                        <a href='{kakao_url}' target='_blank' style='color:#2D6A4F;text-decoration:none;'>{p['title']} 🔗</a>
-                    </div>
-                    <div style='font-size:0.82rem;color:#888;'>📍 {p['addr']}</div>
-                    <div style='font-size:0.82rem;color:#888;'>📏 {p['dist']}km away</div>
-                    {f"<div style='font-size:0.82rem;color:#888;'>📞 {p['tel']}</div>" if p['tel'] else ""}
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.info("No restaurants found nearby.")
-
-    with col2:
-        st.markdown("#### 🏨 Nearby Accommodations")
-        if st.session_state.accommodations:
-            for a in st.session_state.accommodations[:4]:
-                p = format_place(a)
-                kakao_url = f"https://map.kakao.com/link/search/{p['title']}"
-                st.markdown(f"""
-                <div class='place-card'>
-                    <div style='font-weight:600;color:#2D6A4F;'>
-                        <a href='{kakao_url}' target='_blank' style='color:#2D6A4F;text-decoration:none;'>{p['title']} 🔗</a>
-                    </div>
-                    <div style='font-size:0.82rem;color:#888;'>📍 {p['addr']}</div>
-                    <div style='font-size:0.82rem;color:#888;'>📏 {p['dist']}km away</div>
-                    {f"<div style='font-size:0.82rem;color:#888;'>📞 {p['tel']}</div>" if p['tel'] else ""}
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.info("No accommodations found nearby.")
+    render_nearby_spots(course, st.session_state.restaurants, st.session_state.accommodations)
 
 else:
     # 초기 화면
@@ -432,14 +249,14 @@ else:
         cols = st.columns(min(len(theme_courses), 3))
         for i, course in enumerate(theme_courses):
             with cols[i % 3]:
-                diff_color = {"Easy": "#2D6A4F", "Moderate": "#856404", "Challenge": "#842029"}[course['difficulty']]
+                diff_color = {"Easy": DIFF_EASY, "Moderate": DIFF_MODERATE, "Challenge": DIFF_CHALLENGE}[course['difficulty']]
                 pet_icon = "🐾" if course['pet_friendly'] else ""
                 st.markdown(
                     f"<div style='background:white;border-radius:12px;padding:16px;"
-                    f"border:1px solid #D4C9B8;margin-bottom:8px;"
+                    f"border:1px solid {CARD_BORDER};margin-bottom:8px;"
                     f"box-shadow:0 2px 8px rgba(0,0,0,0.06);min-height:140px'>"
-                    f"<div style='font-weight:700;color:#2D6A4F;margin-bottom:6px'>{course['name_en']}</div>"
-                    f"<div style='font-size:0.82rem;color:#666;margin-bottom:10px'>{course['description_en'][:80]}...</div>"
+                    f"<div style='font-weight:700;color:{CARD_VALUE};margin-bottom:6px'>{course['name_en']}</div>"
+                    f"<div style='font-size:0.82rem;color:{TEXT_MUTED_ALT};margin-bottom:10px'>{course['description_en'][:80]}...</div>"
                     f"<div style='font-size:0.8rem;'>📏 {course['distance_km']}km &nbsp;"
                     f"⏱️ {course['duration_hours']}h &nbsp;"
                     f"<span style='color:{diff_color};font-weight:600'>{course['difficulty']}</span>"

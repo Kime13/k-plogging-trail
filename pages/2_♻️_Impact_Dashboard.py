@@ -1,6 +1,10 @@
 import streamlit as st
 import pandas as pd
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
+import logging
+
+logger = logging.getLogger(__name__)
 from supabase import create_client
 import os
 from dotenv import load_dotenv
@@ -11,9 +15,21 @@ import plotly.express as px
 
 load_dotenv()
 
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
-supabase = create_client(url, key)
+_supabase = None
+
+def _get_supabase():
+    """Supabase 클라이언트 lazy 초기화 — 환경변수 미설정 시 import 크래시 방지"""
+    global _supabase
+    if _supabase is None:
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_KEY")
+        if not url or not key:
+            return None
+        _supabase = create_client(url, key)
+    return _supabase
+
+# === CSS Theme Constants ===
+CHART_COLOR = "#2D6A4F"
 
 st.set_page_config(page_title="Impact Dashboard", page_icon="♻️", layout="wide")
 
@@ -25,7 +41,7 @@ st.markdown("### 📝 Log Your Session")
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    log_date = st.date_input("Date", value=date.today())
+    log_date = st.date_input("Date", value=datetime.now(tz=ZoneInfo('Asia/Seoul')).date())
 with col2:
     all_courses = (
         [c["name_en"] for c in JEJU_OLLE_COURSES] +
@@ -45,42 +61,44 @@ waste_type = st.multiselect(
 )
 
 if st.button("➕ Log This Session", type="primary"):
-    try:
-        # Green Point 계산
-        green_points = int(
-            distance_km * 10
-            + waste_kg * 100
-        )
+    sb = _get_supabase()
+    if sb is None:
+        st.error("⚠️ Supabase is not configured. Please set SUPABASE_URL and SUPABASE_KEY.")
+    else:
+        try:
+            green_points = int(
+                distance_km * 10
+                + waste_kg * 100
+            )
 
-        supabase.table("plogging_logs").insert({
-            "date": str(log_date),
-            "course": course_name,
-            "waste_kg": waste_kg,
-            "distance_km": distance_km,
-            "waste_types": ", ".join(waste_type),
-            "green_points": green_points
-        }).execute()
+            sb.table("plogging_logs").insert({
+                "date": str(log_date),
+                "course": course_name,
+                "waste_kg": waste_kg,
+                "distance_km": distance_km,
+                "waste_types": ", ".join(waste_type),
+                "green_points": green_points
+            }).execute()
 
-        st.success(
-            f"✅ Logged! You collected {waste_kg}kg on {course_name}!"
-        )
+            st.success(f"✅ Logged! You collected {waste_kg}kg on {course_name}!")
+            st.success(f"🌱 You earned {green_points} Green Points!")
+            st.balloons()
 
-        st.success(
-            f"🌱 You earned {green_points} Green Points!"
-        )
-
-        st.balloons()
-
-    except Exception as e:
-        st.error(f"Failed to save: {e}")
+        except Exception as e:
+            logger.error(f"Failed to save plogging log for {course_name}: {e}")
+            st.error(f"Failed to save: {e}")
 
 st.markdown("---")
 
 # ── 데이터 로드 ──
 try:
-    response = supabase.table("plogging_logs").select("*").execute()
+    sb = _get_supabase()
+    if sb is None:
+        raise RuntimeError("Supabase not configured")
+    response = sb.table("plogging_logs").select("*").order("created_at", desc=True).limit(200).execute()
     all_data = response.data
-except:
+except Exception as e:
+    logger.warning(f"Failed to load plogging logs from Supabase: {e}")
     all_data = []
 
 DEMO_DATA = [
@@ -128,7 +146,7 @@ with col2:
         x="Waste (kg)",
         y="Course",
         orientation="h",
-        color_discrete_sequence=["#2D6A4F"]
+        color_discrete_sequence=[CHART_COLOR]
     )
     fig.update_layout(
         margin=dict(l=0, r=0, t=0, b=0),
