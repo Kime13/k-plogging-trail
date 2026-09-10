@@ -66,15 +66,24 @@ if st.button("➕ Log This Session", type="primary"):
         st.error("⚠️ Supabase is not configured. Please set SUPABASE_URL and SUPABASE_KEY.")
     else:
         try:
+            green_points = int(
+                distance_km * 10
+                + waste_kg * 100
+            )
+
             sb.table("plogging_logs").insert({
                 "date": str(log_date),
                 "course": course_name,
                 "waste_kg": waste_kg,
                 "distance_km": distance_km,
-                "waste_types": ", ".join(waste_type)
+                "waste_types": ", ".join(waste_type),
+                "green_points": green_points
             }).execute()
+
             st.success(f"✅ Logged! You collected {waste_kg}kg on {course_name}!")
+            st.success(f"🌱 You earned {green_points} Green Points!")
             st.balloons()
+
         except Exception as e:
             logger.error(f"Failed to save plogging log for {course_name}: {e}")
             st.error(f"Failed to save: {e}")
