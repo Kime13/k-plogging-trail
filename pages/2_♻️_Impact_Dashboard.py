@@ -117,12 +117,14 @@ st.markdown("### 🌍 Global Impact (All Participants)")
 total_waste = df["waste_kg"].sum()
 total_distance = df["distance_km"].sum()
 total_sessions = len(df)
+total_green_points = df["green_points"].fillna(0).sum() if "green_points" in df.columns else 0
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 col1.metric("Total Waste Collected", f"{total_waste:.1f} kg")
 col2.metric("Total Distance Jogged", f"{total_distance:.1f} km")
 col3.metric("Total Sessions", f"{total_sessions}")
 col4.metric("Avg per Session", f"{total_waste/total_sessions:.2f} kg")
+col5.metric("🌱 Total Green Points", f"{int(total_green_points):,} P")
 
 st.markdown("---")
 
@@ -162,7 +164,18 @@ st.markdown("---")
 # ── 최근 세션 로그 (최대 50개) ──
 st.markdown("### 🏅 Recent Sessions")
 if all_data:
-    log_df = pd.DataFrame(all_data).tail(50)[["date", "course", "waste_kg", "distance_km", "waste_types"]]
+    columns_to_show = [
+        "date",
+        "course",
+        "waste_kg",
+        "distance_km",
+        "waste_types"
+    ]
+
+    if "green_points" in pd.DataFrame(all_data).columns:
+        columns_to_show.append("green_points")
+
+    log_df = pd.DataFrame(all_data).tail(50)[columns_to_show]
     log_df = log_df.sort_values("date", ascending=False)
     st.dataframe(log_df, use_container_width=True)
 else:
